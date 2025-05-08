@@ -46,7 +46,23 @@ class Tmsm_Appointment_Cancelation_Public
     public function tmsm_handle_user_appointments_content($content)
     {
         global $wp_query;
-        error_log('$wp_query->query_vars: ' . print_r($wp_query->query_vars, true)); // Debugging line
+        if ( isset( $_GET['action'] ) && $_GET['action'] === 'annuler_rendez_vous' && isset( $_GET['appointment_id'] ) ) {
+            // Vérifier le nonce pour la sécurité
+            if ( ! isset( $_GET['nonce'] ) || ! wp_verify_nonce( $_GET['nonce'], 'annuler_rendez_vous_' . $_GET['appointment_id'] ) ) {
+                return '<p>Nonce invalide. Action non autorisée.</p>';
+            }
+            // Todo creation de la fonction pour annuler le rendez-vous
+            
+
+            // Récupérer l'ID du rendez-vous à annuler
+            $appointment_id = intval($_GET['appointment_id']);
+
+            // Ici, vous devez ajouter la logique pour annuler le rendez-vous
+            // Par exemple, supprimer le rendez-vous de la base de données
+
+            // Afficher un message de succès ou d'erreur
+            return '<p>Rendez-vous annulé avec succès.</p>';
+        }
         if (is_page('vos-rendez-vous')) {
             // Récupérer l'identifiant de l'utilisateur depuis la variable de requête
             $user_id = get_query_var('user_id');
@@ -54,7 +70,7 @@ class Tmsm_Appointment_Cancelation_Public
             if ($user_id) {
                 // Ici, nous allons récupérer et afficher les rendez-vous de l'utilisateur
                 $appointments = $this->tmsm_get_user_appointments($user_id); // Fonction à créer
-
+                // todo traitement des ids multiples de rendez-vous
                 // $output = '<h2>Vos Rendez-vous</h2>';
                 $output = '<p>Voici la liste de vos rendez-vous :</p>';
                 if (! empty($appointments)) {
@@ -84,11 +100,13 @@ class Tmsm_Appointment_Cancelation_Public
         // Pour l'exemple, nous allons retourner un tableau vide ou quelques objets factices.
         // Exemple de données factices :
         return [
-            (object) ['ID' => 1, 'date' => '2025-05-10', 'appointment_id' => 10],
-            (object) ['ID' => 2, 'date' => '2025-05-15', 'appointment_id' => 20],
+            (object) ['ID' => 1, 'date' => '2025-05-10', 'appointment_id' => [10, 11]],
+            (object) ['ID' => 2, 'date' => '2025-05-15', 'appointment_id' => [20]],
         ];
         // return []; // Retourner un tableau vide si aucun rendez-vous
     }
+
+
 
     // IMPORTANT : Vous n'avez plus besoin de réenregistrer les permaliens
     // car nous n'utilisons plus de point de terminaison personnalisé de la même manière.
