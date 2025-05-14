@@ -125,6 +125,8 @@ class Tmsm_Appointment_Cancelation {
 	 */
 	private function define_admin_hooks() {
         $plugin_admin = new Tmsm_Appointment_Cancelation_Admin( $this->get_plugin_name(), $this->get_version() );
+
+		$this->loader->add_action( 'admin_menu', $plugin_admin, 'tmsm_appointment_cancelation_options_page' );
     }
 
     /**
