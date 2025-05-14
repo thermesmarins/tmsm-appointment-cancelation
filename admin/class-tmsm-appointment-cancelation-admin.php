@@ -45,7 +45,7 @@ class Tmsm_Appointment_Cancelation_Admin
 
         add_settings_section(
             'tmsm_general_settings_section', // ID unique de la section
-            __('Réglages Généraux', 'tmsm-appointment-cancelation'), // Titre de la section
+            __('Global Settings', 'tmsm-appointment-cancelation'), // Titre de la section
             array($this, 'tmsm_general_settings_section_callback'), // Fonction de callback pour afficher la description de la section (facultatif)
             'tmsm-appointment-cancelation-settings' // Le slug de la page où afficher cette section (doit correspondre à do_settings_sections())
         );
@@ -64,12 +64,32 @@ class Tmsm_Appointment_Cancelation_Admin
             'tmsm-appointment-cancelation-settings', // Le slug de la page où afficher ce champ
             'tmsm_general_settings_section' // L'ID de la section à laquelle ce champ appartient
         );
+        add_settings_field(
+            'cancelation_token', // ID unique du champ
+            __('Cancelation Token', 'tmsm-appointment-cancelation'), // Titre du champ
+            array($this, 'tmsm_cancellation_token_field_callback'), // Fonction de callback pour afficher le champ
+            'tmsm-appointment-cancelation-settings', // Le slug de la page où afficher ce champ
+            'tmsm_general_settings_section' // L'ID de la section à laquelle ce champ appartient
+        );
     }
 
     public function sanitize_options($input)
     {
         // Sanitize les données entrantes ici
-        return $input;
+        // Sanitize l'URL
+        if (isset($input['api_url'])) {
+            $sanitized_input['api_url'] = esc_url_raw($input['api_url']);
+        }
+        if (isset($input['api_days'])) {
+            $sanitized_input['api_days'] = absint($input['api_days']);
+        }
+        if (isset($input['api_token'])) {
+            $sanitized_input['api_token'] = sanitize_text_field($input['api_token']);
+        }
+        if (isset($input['cancellation_deadline'])) {
+            $sanitized_input['cancellation_deadline'] = sanitize_text_field($input['cancellation_deadline']);
+        }
+        return $sanitized_input;
     }
 
     public function section_callback($args)
@@ -127,12 +147,18 @@ class Tmsm_Appointment_Cancelation_Admin
     {
         $options = get_option('tmsm_appointment_cancelation_options');
         $value = isset($options['cancellation_deadline']) ? esc_attr($options['cancellation_deadline']) : '';
-        echo '<input type="text" id="cancellation_deadline" name="tmsm_appointment_cancelation_options[cancellation_deadline]" value="' . esc_attr($value) . '">';
+        echo '<input type="number" id="cancellation_deadline" name="tmsm_appointment_cancelation_options[cancellation_deadline]" value="' . esc_attr($value) . '">';
     }
     function tmsm_cancellation_url_field_callback()
     {
         $options = get_option('tmsm_appointment_cancelation_options');
         $value = isset($options['cancellation_url']) ? esc_attr($options['cancellation_url']) : '';
         echo '<input type="text" id="cancellation_url" name="tmsm_appointment_cancelation_options[cancellation_url]" value="' . esc_attr($value) . '">';
+    }
+    function tmsm_cancellation_token_field_callback()
+    {
+        $options = get_option('tmsm_appointment_cancelation_options');
+        $value = isset($options['cancellation_token']) ? esc_attr($options['cancellation_token']) : '';
+        echo '<input type="text" id="cancellation_token" name="tmsm_appointment_cancelation_options[cancellation_token]" value="' . esc_attr($value) . '">';
     }
 }
