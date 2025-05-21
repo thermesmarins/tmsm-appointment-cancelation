@@ -81,13 +81,19 @@ class Tmsm_Appointment_Cancelation_Public
 
             error_log('*** LOGIQUE D\'ANNULATION EXÉCUTÉE (action init) ***'); // Ce log ne s'affichera qu'une seule fois si cette action est déclenchée
             // error_log("Tentative d'annulation du rendez-vous ID: $appointment_id pour utilisateur: $numeric_user_id sur site: $site_id_from_token");
+            $cancel_status = false; // Initialiser le statut d'annulation
 
             // TODO: Appeler la méthode d'annulation de l'API
             // Exemple: $aquos_api_handler_for_action->cancel_appointment($appointment_id, $numeric_user_id, $site_id_from_token);
 
             // Rediriger l'utilisateur après l'action pour éviter les soumissions multiples
-            $redirect_url = remove_query_arg( array('action', 'appointment_id', 'nonce', 'fonctionnal_id', 'token') );
+            $redirect_url = remove_query_arg( array('action', 'appointment_id', 'nonce') );
+             // Ajouter le statut de l'annulation
+        if ( $cancel_status ) {
             $redirect_url = add_query_arg( 'cancel_status', 'success', $redirect_url );
+        } else {
+            $redirect_url = add_query_arg( 'cancel_status', 'error', $redirect_url );
+        }
             wp_redirect( $redirect_url );
             exit; // Très important de terminer l'exécution ici après une redirection
         }
@@ -100,28 +106,25 @@ class Tmsm_Appointment_Cancelation_Public
         global $wp_query;
         // Varioble à récupérer dans l'url (date de rendez-vous, id fonctionnel, token)
 
-
-        // if (isset($_GET['action']) && $_GET['action'] === 'annuler_rendez_vous' && isset($_GET['appointment_id'])) {
-        //     // Vérifier le nonce pour la sécurité
-        //     if (! isset($_GET['nonce']) || ! wp_verify_nonce($_GET['nonce'], 'annuler_rendez_vous_' . $_GET['appointment_id'])) {
-        //         return '<p>Nonce invalide. Action non autorisée.</p>';
-        //     }
-        //     // Todo creation de la fonction pour annuler le rendez-vous
-        //     // Récupérer l'ID du rendez-vous à annuler
-        //     $appointment_id = intval($_GET['appointment_id']);
-        //     $fonctionnal_id = get_query_var('fonctionnal_id') ?: (isset($_GET['fonctionnal_id']) ? sanitize_text_field($_GET['fonctionnal_id']) : '');
-        //     $token = get_query_var('token') ?: (isset($_GET['token']) ? sanitize_text_field($_GET['token']) : '');
-
-
-        //     // Ici, vous devez ajouter la logique pour annuler le rendez-vous
-        //     // Par exemple, supprimer le rendez-vous de la base de données
-        //     if (is_null($this->aquos_api_handler)) {
-        //         $this->aquos_api_handler = new Tmsm_Appointment_Cancelation_Aquos($fonctionnal_id, $token);
-        //     }
-        //     error_log('2');
-        //     // Afficher un message de succès ou d'erreur
-        //     return '<p>Rendez-vous annulé avec succès.</p>';
-        // }
+            $output = ''; // Initialiser la sortie
+         if ( isset($_GET['cancel_status']) ) {
+            $cancel_status = sanitize_text_field($_GET['cancel_status']);
+            
+            if ( 'success' === $cancel_status ) {
+                $output .= '<div class="tmsm-notification tmsm-notification-success">';
+                $output .= '<p>Votre rendez-vous a été annulé avec succès !</p>';
+                $output .= '</div>';
+            } elseif ( 'error' === $cancel_status ) {
+                $output .= '<div class="tmsm-notification tmsm-notification-error">';
+                $output .= '<p>Une erreur est survenue lors de l\'annulation de votre rendez-vous. Veuillez réessayer.</p>';
+                $output .= '</div>';
+            }
+            // Nettoyer le paramètre d'URL pour qu'il ne reste pas si la page est rafraîchie manuellement
+            // Note: Une redirection est une meilleure pratique pour cela, mais si vous voulez qu'il disparaisse après un rafraîchissement manuel
+            // vous devriez faire une redirection JavaScript après l'affichage, ou utiliser les transients comme discuté précédemment
+            // mais sur la page de destination et pas sur la page d'accueil.
+            return $output;
+        }
         if (is_page('vos-rendez-vous')) {
              $fonctionnal_id = get_query_var('fonctionnal_id');
             $token = get_query_var('token');
