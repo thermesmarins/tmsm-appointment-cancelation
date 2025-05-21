@@ -41,8 +41,8 @@ class Tmsm_Appointment_Cancelation_Aquos
         // Extraire l'ID numérique de l'ID fonctionnel
         $this->aquos_appointment_id = $this->extract_numeric_id_from_fonctional_id($this->aquos_focntionnal_id);
 
-         $site_code_extracted = $this->extract_site_code_from_token($this->aquos_focntionnal_id);
-         $this->aquos_site_id = $this->get_site_id_from_code($site_code_extracted);
+        $site_code_extracted = $this->extract_site_code_from_token($this->aquos_focntionnal_id);
+        $this->aquos_site_id = $this->get_site_id_from_code($site_code_extracted);
     }
     /**
      * Extrait le code du site (lettres majuscules) d'un token.
@@ -69,16 +69,18 @@ class Tmsm_Appointment_Cancelation_Aquos
      * @param string $fonctional_id Le ID fonctionnel complet (ex: "156786AQREN").
      * @return int|null La partie numérique (ex: 156786) ou null si non trouvée.
      */
-    private function extract_numeric_id_from_fonctional_id( $fonctional_id ) {
+    private function extract_numeric_id_from_fonctional_id($fonctional_id)
+    {
         // L'expression régulière cherche une ou plusieurs chiffres (0-9)
         // au début de la chaîne (^)
         $pattern = '/^([0-9]+)/';
-        if ( preg_match( $pattern, $fonctional_id, $matches ) ) {
+        if (preg_match($pattern, $fonctional_id, $matches)) {
             return (int) $matches[1]; // Cast en entier
         }
         return null;
     }
-    public function get_aquos_appointment_id() {
+    public function get_aquos_appointment_id()
+    {
         return $this->aquos_appointment_id;
     }
     /**
@@ -100,14 +102,24 @@ class Tmsm_Appointment_Cancelation_Aquos
      *
      * @return int|null L'ID du site ou null.
      */
-    public function get_aquos_site_id() {
+    public function get_aquos_site_id()
+    {
         return $this->aquos_site_id;
     }
-
-    // Vous pouvez également ajouter des getters pour les autres propriétés si vous en avez besoin
-    public function get_aquos_security_token() {
+    /**
+     * Méthode publique pour récupérer l'URL d'annulation Aquos.
+     *
+     * @return string L'URL d'annulation Aquos.
+     */
+    public function get_aquos_security_token()
+    {
         return $this->aquos_security_token;
     }
+    /**
+     * Méthode publique pour récupérer l'URL d'annulation Aquos.
+     *
+     * @return string L'URL d'annulation Aquos.
+     */
     public function get_aquos_appointment_date()
     {
         $date = new DateTime($this->aquos_appointment_date);
