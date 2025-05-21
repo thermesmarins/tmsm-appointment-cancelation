@@ -12,7 +12,7 @@ class Tmsm_Appointment_Cancelation_Aquos
     private $aquos_appointment_delay;
     private $aquos_daily_appointment_url;
     private $aquos_security_token;
-    private $aquos_focntionnal_id;
+    private $aquos_fonctionnal_id;
     private $aquos_appointment_signature;
     private $aquos_appointment_id;
     private $aquos_site_id;
@@ -22,7 +22,7 @@ class Tmsm_Appointment_Cancelation_Aquos
     public function __construct($fonctionnal_id, $aquos_appointment_signature, $appointment_date = null)
     {
         $this->aquos_appointment_date = $appointment_date;
-        $this->aquos_focntionnal_id = $fonctionnal_id;
+        $this->aquos_fonctionnal_id = $fonctionnal_id;
         $this->aquos_appointment_signature = $aquos_appointment_signature;
         error_log('Aquos appointment signature: ' . $this->aquos_appointment_signature);
         $this->aquos_appointment_date = $appointment_date;
@@ -39,9 +39,8 @@ class Tmsm_Appointment_Cancelation_Aquos
             'AQNA'  => 5,
         );
         // Extraire l'ID numérique de l'ID fonctionnel
-        $this->aquos_appointment_id = $this->extract_numeric_id_from_fonctional_id($this->aquos_focntionnal_id);
-
-        $site_code_extracted = $this->extract_site_code_from_token($this->aquos_focntionnal_id);
+        $this->aquos_appointment_id = $this->extract_numeric_id_from_fonctional_id($this->aquos_fonctionnal_id);
+        $site_code_extracted = $this->extract_site_code_from_token($this->aquos_fonctionnal_id);
         $this->aquos_site_id = $this->get_site_id_from_code($site_code_extracted);
     }
     /**
@@ -51,13 +50,13 @@ class Tmsm_Appointment_Cancelation_Aquos
      * @param string $token_full Le token complet (ex: "125456AQREN").
      * @return string|null Le code du site (ex: "AQREN") ou null si non trouvé.
      */
-    private function extract_site_code_from_token($aquos_focntionnal_id)
+    private function extract_site_code_from_token($aquos_fonctionnal_id)
     {
         // L'expression régulière cherche une ou plusieurs lettres majuscules (A-Z)
         // à la fin de la chaîne ($).
         $pattern = '/([A-Z]+)$/';
 
-        if (preg_match($pattern, $aquos_focntionnal_id, $matches)) {
+        if (preg_match($pattern, $aquos_fonctionnal_id, $matches)) {
             return $matches[1];
         }
         return null;

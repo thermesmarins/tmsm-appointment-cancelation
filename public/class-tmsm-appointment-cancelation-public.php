@@ -167,13 +167,13 @@ class Tmsm_Appointment_Cancelation_Public
 
             $site_id = $this->aquos_api_handler->get_aquos_site_id();
 
-
+// todo: vérifier la présence de la date et de la signature dans l'url
             if ($fonctionnal_id) {
                 // Ici, nous allons récupérer et afficher les rendez-vous de l'utilisateur
                 $appointments = $this->tmsm_get_user_appointments($fonctionnal_id); // Fonction à créer
                 // todo traitement des ids multiples de rendez-vous
                 // $output = '<h2>Vos Rendez-vous</h2>';
-                $output = '<p>Voici la liste de vos rendez-vous : pour l\'utilisateur ' . $fonctionnal_id . '  avec le token  : ' . $token . '</p>';
+                $output = '<p>Voici la liste de vos rendez-vous : pour l\'utilisateur ' . $fonctionnal_id . '  avec le token  : ' . $aquos_appointment_signature . '</p>';
                 if (! empty($appointments)) {
                     $output .= '<ul>';
                     foreach ($appointments as $appointment) {
@@ -183,7 +183,7 @@ class Tmsm_Appointment_Cancelation_Public
                                 'appointment_id' => $appointment->appointment_id, // Si appointment_id est un tableau, cela doit être géré
                                 'nonce'          => wp_create_nonce('annuler_rendez_vous_' . $appointment->appointment_id),
                                 'fonctionnal_id' => $fonctionnal_id, // Pour repasser l'ID fonctionnel si besoin
-                                'token'          => $token, // Pour repasser le token de l'URL si besoin
+                                'aquos_appointment_signature'=> $aquos_appointment_signature, // Pour repasser le token de l'URL si besoin
                                 'site_id'        => $site_id,
                             )
                         );
