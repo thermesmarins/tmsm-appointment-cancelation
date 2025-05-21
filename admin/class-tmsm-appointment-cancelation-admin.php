@@ -51,21 +51,28 @@ class Tmsm_Appointment_Cancelation_Admin
         );
 
         add_settings_field(
-            'cancellation_deadline', // ID unique du champ
+            'aquos_appointment_cancellation_deadline', // ID unique du champ
             __('Deadline Cancelation', 'tmsm-appointment-cancelation'), // Titre du champ
             array($this, 'tmsm_cancellation_deadline_field_callback'), // Fonction de callback pour afficher le champ
             'tmsm-appointment-cancelation-settings', // Le slug de la page où afficher ce champ
             'tmsm_general_settings_section' // L'ID de la section à laquelle ce champ appartient
         );
         add_settings_field(
-            'cancellation_url', // ID unique du champ
+            'aquos_appointment_cancellation_url', // ID unique du champ
             __('Cancelation Url', 'tmsm-appointment-cancelation'), // Titre du champ
             array($this, 'tmsm_cancellation_url_field_callback'), // Fonction de callback pour afficher le champ
             'tmsm-appointment-cancelation-settings', // Le slug de la page où afficher ce champ
             'tmsm_general_settings_section' // L'ID de la section à laquelle ce champ appartient
         );
         add_settings_field(
-            'cancelation_token', // ID unique du champ
+            'aquos_appointment_daily_url', // ID unique du champ
+            __('Daily Url', 'tmsm-appointment-cancelation'), // Titre du champ
+            array($this, 'tmsm_appointment_daily_url_field_callback'), // Fonction de callback pour afficher le champ
+            'tmsm-appointment-cancelation-settings', // Le slug de la page où afficher ce champ
+            'tmsm_general_settings_section' // L'ID de la section à laquelle ce champ appartient
+        );
+        add_settings_field(
+            'aquos_appointment_cancelation_token', // ID unique du champ
             __('Cancelation Token', 'tmsm-appointment-cancelation'), // Titre du champ
             array($this, 'tmsm_cancellation_token_field_callback'), // Fonction de callback pour afficher le champ
             'tmsm-appointment-cancelation-settings', // Le slug de la page où afficher ce champ
@@ -77,17 +84,20 @@ class Tmsm_Appointment_Cancelation_Admin
     {
         // Sanitize les données entrantes ici
         // Sanitize l'URL
-        if (isset($input['api_url'])) {
-            $sanitized_input['api_url'] = esc_url_raw($input['api_url']);
+        if (isset($input['aquos_appointment_cancellation_url'])) {
+            $sanitized_input['aquos_appointment_cancellation_url'] = esc_url_raw($input['aquos_appointment_cancellation_url']);
         }
-        if (isset($input['api_days'])) {
-            $sanitized_input['api_days'] = absint($input['api_days']);
+        if (isset($input['aquos_appointment_daily_url'])) {
+            $sanitized_input['aquos_appointment_daily_url'] = esc_url_raw($input['aquos_appointment_daily_url']);
         }
-        if (isset($input['api_token'])) {
-            $sanitized_input['api_token'] = sanitize_text_field($input['api_token']);
+        if (isset($input['aquos_appointment_api_days'])) {
+            $sanitized_input['aquos_appointment_api_days'] = absint($input['aquos_appointment_api_days']);
         }
-        if (isset($input['cancellation_deadline'])) {
-            $sanitized_input['cancellation_deadline'] = sanitize_text_field($input['cancellation_deadline']);
+        if (isset($input['aquos_appointment_cancellation_token'])) {
+            $sanitized_input['aquos_appointment_cancellation_token'] = sanitize_text_field($input['aquos_appointment_cancellation_token']);
+        }
+        if (isset($input['aquos_appointment_cancellation_deadline'])) {
+            $sanitized_input['aquos_appointment_cancellation_deadline'] = sanitize_text_field($input['aquos_appointment_cancellation_deadline']);
         }
         return $sanitized_input;
     }
@@ -124,7 +134,7 @@ class Tmsm_Appointment_Cancelation_Admin
             return;
         }
 ?>
-        <div class="wrap">
+        <div class="wrap" >
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
             <form action="options.php" method="post">
                 <?php
@@ -146,19 +156,25 @@ class Tmsm_Appointment_Cancelation_Admin
     function tmsm_cancellation_deadline_field_callback()
     {
         $options = get_option('tmsm_appointment_cancelation_options');
-        $value = isset($options['cancellation_deadline']) ? esc_attr($options['cancellation_deadline']) : '';
-        echo '<input type="number" id="cancellation_deadline" name="tmsm_appointment_cancelation_options[cancellation_deadline]" value="' . esc_attr($value) . '">';
+        $value = isset($options['aquos_appointment_cancellation_deadline']) ? esc_attr($options['aquos_appointment_cancellation_deadline']) : '';
+        echo '<input type="number" id="aquos_appointment_cancellation_deadline" name="tmsm_appointment_cancelation_options[aquos_appointment_cancellation_deadline]" value="' . esc_attr($value) . '" >';
     }
     function tmsm_cancellation_url_field_callback()
     {
         $options = get_option('tmsm_appointment_cancelation_options');
-        $value = isset($options['cancellation_url']) ? esc_attr($options['cancellation_url']) : '';
-        echo '<input type="text" id="cancellation_url" name="tmsm_appointment_cancelation_options[cancellation_url]" value="' . esc_attr($value) . '">';
+        $value = isset($options['aquos_appointment_cancellation_url']) ? esc_attr($options['aquos_appointment_cancellation_url']) : '';
+        echo '<input type="text" id="aquos_appointment_cancellation_url" name="tmsm_appointment_cancelation_options[aquos_appointment_cancellation_url]" value="' . esc_attr($value) . '"style="width: 500px;">';
+    }
+    function tmsm_appointment_daily_url_field_callback()
+    {
+        $options = get_option('tmsm_appointment_cancelation_options');
+        $value = isset($options['aquos_appointment_daily_url']) ? esc_attr($options['aquos_appointment_daily_url']) : '';
+        echo '<input type="text" id="aquos_appointment_daily_url" name="tmsm_appointment_cancelation_options[aquos_appointment_daily_url]" value="' . esc_attr($value) . '"style="width: 500px;">';
     }
     function tmsm_cancellation_token_field_callback()
     {
         $options = get_option('tmsm_appointment_cancelation_options');
-        $value = isset($options['cancellation_token']) ? esc_attr($options['cancellation_token']) : '';
-        echo '<input type="text" id="cancellation_token" name="tmsm_appointment_cancelation_options[cancellation_token]" value="' . esc_attr($value) . '">';
+        $value = isset($options['aquos_appointment_cancellation_token']) ? esc_attr($options['aquos_appointment_cancellation_token']) : '';
+        echo '<input type="text" id="aquos_appointment_cancellation_token" name="tmsm_appointment_cancelation_options[aquos_appointment_cancellation_token]" value="' . esc_attr($value) . '"style="width: 500px;">';
     }
 }
