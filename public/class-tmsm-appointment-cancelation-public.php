@@ -45,26 +45,29 @@ class Tmsm_Appointment_Cancelation_Public
         add_action('wp_enqueue_scripts', array($this, 'enqueue_styles'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
     }
-// Nouvelle méthode dans Tmsm_Appointment_Cancelation_Public
-public function enqueue_styles() {
-    wp_enqueue_style(
-        $this->plugin_name . '-public',
-        plugin_dir_url( __FILE__ ) . 'assets/css/tmsm-appointment-cancelation-public.css', // Assurez-vous que le chemin est correct
-        array(),
-        $this->version,
-        'all'
-    );}
+    // Nouvelle méthode dans Tmsm_Appointment_Cancelation_Public
+    public function enqueue_styles()
+    {
+        wp_enqueue_style(
+            $this->plugin_name . '-public',
+            plugin_dir_url(__FILE__) . 'assets/css/tmsm-appointment-cancelation-public.css', // Assurez-vous que le chemin est correct
+            array(),
+            $this->version,
+            'all'
+        );
+    }
 
     // Nouvelle méthode dans Tmsm_Appointment_Cancelation_Public
-public function enqueue_scripts() {
-    wp_enqueue_script(
-        $this->plugin_name . '-public',
-        plugin_dir_url( __FILE__ ) . '/assets/js/tmsm-appointment-cancelation-public.js', // Assurez-vous que le chemin est correct
-        array( 'jquery' ), // Dépendance jQuery si vous l'utilisez
-        $this->version,
-        true // Charger le script dans le footer
-    );
-}
+    public function enqueue_scripts()
+    {
+        wp_enqueue_script(
+            $this->plugin_name . '-public',
+            plugin_dir_url(__FILE__) . '/assets/js/tmsm-appointment-cancelation-public.js', // Assurez-vous que le chemin est correct
+            array('jquery'), // Dépendance jQuery si vous l'utilisez
+            $this->version,
+            true // Charger le script dans le footer
+        );
+    }
     // Ajout de la variable de requête pour l'identifiant de l'utilisateur
     public function tmsm_add_query_vars($vars)
     {
@@ -73,12 +76,13 @@ public function enqueue_scripts() {
         return $vars;
     }
     // add_filter( 'query_vars', 'tmsm_add_query_vars' );
-     /**
+    /**
      * Gère l'action d'annulation de rendez-vous en utilisant l'action 'init'.
      * Cela assure que la logique d'annulation ne s'exécute qu'une seule fois.
      */
-    public function handle_cancel_appointment_action() {
-        if ( isset($_GET['action']) && $_GET['action'] === 'annuler_rendez_vous' && isset($_GET['appointment_id']) ) {
+    public function handle_cancel_appointment_action()
+    {
+        if (isset($_GET['action']) && $_GET['action'] === 'annuler_rendez_vous' && isset($_GET['appointment_id'])) {
             // Vérifier le nonce pour la sécurité
             if (! isset($_GET['nonce']) || ! wp_verify_nonce($_GET['nonce'], 'annuler_rendez_vous_' . $_GET['appointment_id'])) {
                 wp_die('<p>Nonce invalide. Action non autorisée.</p>', __('Error', 'tmsm-appointment-cancelation'));
@@ -95,7 +99,7 @@ public function enqueue_scripts() {
 
             // Instancier Tmsm_Appointment_Cancelation_Aquos pour cette action spécifique d'annulation
             $aquos_api_handler_for_action = new Tmsm_Appointment_Cancelation_Aquos($fonctionnal_id, $plugin_api_token);
-            
+
             // Récupérer l'ID numérique de l'utilisateur et l'ID du site pour l'appel API
             // $numeric_user_id = $aquos_api_handler_for_action->get_aquos_numeric_id();
             $site_id_from_token = $aquos_api_handler_for_action->get_aquos_site_id();
@@ -108,14 +112,14 @@ public function enqueue_scripts() {
             // Exemple: $aquos_api_handler_for_action->cancel_appointment($appointment_id, $numeric_user_id, $site_id_from_token);
 
             // Rediriger l'utilisateur après l'action pour éviter les soumissions multiples
-            $redirect_url = remove_query_arg( array('action', 'appointment_id', 'nonce') );
-             // Ajouter le statut de l'annulation
-        if ( $cancel_status ) {
-            $redirect_url = add_query_arg( 'cancel_status', 'success', $redirect_url );
-        } else {
-            $redirect_url = add_query_arg( 'cancel_status', 'error', $redirect_url );
-        }
-            wp_redirect( $redirect_url );
+            $redirect_url = remove_query_arg(array('action', 'appointment_id', 'nonce'));
+            // Ajouter le statut de l'annulation
+            if ($cancel_status) {
+                $redirect_url = add_query_arg('cancel_status', 'success', $redirect_url);
+            } else {
+                $redirect_url = add_query_arg('cancel_status', 'error', $redirect_url);
+            }
+            wp_redirect($redirect_url);
             exit; // Très important de terminer l'exécution ici après une redirection
         }
     }
@@ -127,15 +131,15 @@ public function enqueue_scripts() {
         global $wp_query;
         // Varioble à récupérer dans l'url (date de rendez-vous, id fonctionnel, token)
 
-            $output = ''; // Initialiser la sortie
-         if ( isset($_GET['cancel_status']) ) {
+        $output = ''; // Initialiser la sortie
+        if (isset($_GET['cancel_status'])) {
             $cancel_status = sanitize_text_field($_GET['cancel_status']);
-            
-            if ( 'success' === $cancel_status ) {
+
+            if ('success' === $cancel_status) {
                 $output .= '<div class="tmsm-notification tmsm-notification-success">';
                 $output .= '<p>Votre rendez-vous a été annulé avec succès !</p>';
                 $output .= '</div>';
-            } elseif ( 'error' === $cancel_status ) {
+            } elseif ('error' === $cancel_status) {
                 $output .= '<div class="tmsm-notification tmsm-notification-error">';
                 $output .= '<p>Une erreur est survenue lors de l\'annulation de votre rendez-vous. Veuillez réessayer.</p>';
                 $output .= '</div>';
@@ -147,16 +151,16 @@ public function enqueue_scripts() {
             return $output;
         }
         if (is_page('vos-rendez-vous')) {
-             $fonctionnal_id = get_query_var('fonctionnal_id');
+            $fonctionnal_id = get_query_var('fonctionnal_id');
             $token = get_query_var('token');
-        if (is_null($this->aquos_api_handler)) {
+            if (is_null($this->aquos_api_handler)) {
                 $this->aquos_api_handler = new Tmsm_Appointment_Cancelation_Aquos($fonctionnal_id, $token);
                 // Messages de log à exécuter une seule fois lors de la création de l'instance
                 error_log('ID Fonctionnel Complet : ' . $fonctionnal_id);
                 error_log('ID Numérique Extrait : ' . $this->aquos_api_handler->get_aquos_appointment_id());
                 error_log('Code de Site Extrait : ' . $this->aquos_api_handler->get_aquos_site_id());
             }
-           
+
             $site_id = $this->aquos_api_handler->get_aquos_site_id();
 
 
