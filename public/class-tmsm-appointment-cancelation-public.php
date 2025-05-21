@@ -72,7 +72,8 @@ class Tmsm_Appointment_Cancelation_Public
     public function tmsm_add_query_vars($vars)
     {
         $vars[] = 'fonctionnal_id';
-        $vars[] = 'token';
+        $vars[] = 'aquos_appointment_signature';
+        $vars[] = 'date';
         return $vars;
     }
     // add_filter( 'query_vars', 'tmsm_add_query_vars' );
@@ -127,7 +128,7 @@ class Tmsm_Appointment_Cancelation_Public
     // Action à exécuter lorsque notre point de terminaison est visité
     public function tmsm_handle_user_appointments_content($content)
     {
-        // https://aquatonic.local/rennes/vos-rendez-vous/?fonctionnal_id=12345AQREN&token=1641616111155&date=2025-05-10
+        // https://aquatonic.local/rennes/vos-rendez-vous/?fonctionnal_id=12345AQREN&aquos_appointment_signature=1641616111155&date=2025-05-10
         global $wp_query;
         // Varioble à récupérer dans l'url (date de rendez-vous, id fonctionnel, token)
 
@@ -152,13 +153,16 @@ class Tmsm_Appointment_Cancelation_Public
         }
         if (is_page('vos-rendez-vous')) {
             $fonctionnal_id = get_query_var('fonctionnal_id');
-            $token = get_query_var('token');
+            $aquos_appointment_signature = get_query_var('aquos_appointment_signature');
+            $date = get_query_var('date');
+            error_log('Date de rendez-vous : ' . $date . ' est de type ' . gettype($date));
             if (is_null($this->aquos_api_handler)) {
-                $this->aquos_api_handler = new Tmsm_Appointment_Cancelation_Aquos($fonctionnal_id, $token);
+                $this->aquos_api_handler = new Tmsm_Appointment_Cancelation_Aquos($fonctionnal_id, $aquos_appointment_signature, $date);
                 // Messages de log à exécuter une seule fois lors de la création de l'instance
                 error_log('ID Fonctionnel Complet : ' . $fonctionnal_id);
                 error_log('ID Numérique Extrait : ' . $this->aquos_api_handler->get_aquos_appointment_id());
                 error_log('Code de Site Extrait : ' . $this->aquos_api_handler->get_aquos_site_id());
+                error_log('Date Extrait : ' . $this->aquos_api_handler->get_aquos_appointment_date());
             }
 
             $site_id = $this->aquos_api_handler->get_aquos_site_id();
@@ -213,13 +217,5 @@ class Tmsm_Appointment_Cancelation_Public
         // return []; // Retourner un tableau vide si aucun rendez-vous
     }
 
-
-
-    // IMPORTANT : Vous n'avez plus besoin de réenregistrer les permaliens
-    // car nous n'utilisons plus de point de terminaison personnalisé de la même manière.
 }
 
-
-
-// IMPORTANT : Vous n'avez plus besoin de réenregistrer les permaliens
-// car nous n'utilisons plus de point de terminaison personnalisé de la même manière.

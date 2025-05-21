@@ -19,11 +19,13 @@ class Tmsm_Appointment_Cancelation_Aquos
     private $aquos_sites;
     private $aquos_appointment_date;
 
-    public function __construct($fonctionnal_id, $token, $appointment_date = null)
+    public function __construct($fonctionnal_id, $aquos_appointment_signature, $appointment_date = null)
     {
         $this->aquos_appointment_date = $appointment_date;
         $this->aquos_focntionnal_id = $fonctionnal_id;
-        $this->aquos_security_token = $token;
+        $this->aquos_appointment_signature = $aquos_appointment_signature;
+        error_log('Aquos appointment signature: ' . $this->aquos_appointment_signature);
+        $this->aquos_appointment_date = $appointment_date;
         $options = get_option('tmsm_appointment_cancelation_options');
         $this->aquos_cancelation_url = isset($options['aquos_appointment_cancellation_url']) ? esc_attr($options['aquos_appointment_cancellation_url']) : '';
         $this->aquos_appointment_delay = isset($options['aquos_appointment_cancellation_deadline']) ? esc_attr($options['aquos_appointment_cancellation_deadline']) : '';
@@ -106,18 +108,9 @@ class Tmsm_Appointment_Cancelation_Aquos
     public function get_aquos_security_token() {
         return $this->aquos_security_token;
     }
-
-    //  fonctionnal_id
-    //  token
-    //  appointment_id
-    // site_id
-    //  sites (array)
-    //  action
-    //  nonce
-    // cancellation url and method
-    // daily appointment url and method
-    // security token for cancellation
-
-
-
+    public function get_aquos_appointment_date()
+    {
+        $date = new DateTime($this->aquos_appointment_date);
+        return $date->format('Ymd');
+    }
 }
