@@ -1,0 +1,40 @@
+.tmsm-notification{
+    padding: 15px;
+    margin: 20px 0;
+    text-align: center;
+    border-radius: 4px;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-size: 16px;
+    font-family: sans-serif;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 90%; /* ou une largeur fixe */
+    margin-left: auto;
+    margin-right: auto;
+}
+.tmsm-notification-success {
+    background-color: #dff0d8; /* Vert pâle pour succès */
+    color: #3c763d;
+    border-color: #d6e9c6;
+}
+.tmsm-notification-error {
+    background-color: #f2dede; /* Rouge pâle pour erreur */
+    color: #a94442;
+    border-color: #ebccd1;
+}
+
+.tmsm-close-notification {
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .2;
+}
+
+.tmsm-close-notification:hover {
+    opacity: .5;
+}
