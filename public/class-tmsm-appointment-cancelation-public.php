@@ -43,6 +43,7 @@ class Tmsm_Appointment_Cancelation_Public
         // Hook pour gérer l'action d'annulation plus tôt dans le cycle de chargement de WordPress
         add_action('init', array($this, 'handle_cancel_appointment_action'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_styles'));
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
     }
 // Nouvelle méthode dans Tmsm_Appointment_Cancelation_Public
 public function enqueue_styles() {
@@ -53,6 +54,17 @@ public function enqueue_styles() {
         $this->version,
         'all'
     );}
+
+    // Nouvelle méthode dans Tmsm_Appointment_Cancelation_Public
+public function enqueue_scripts() {
+    wp_enqueue_script(
+        $this->plugin_name . '-public',
+        plugin_dir_url( __FILE__ ) . '/assets/js/tmsm-appointment-cancelation-public.js', // Assurez-vous que le chemin est correct
+        array( 'jquery' ), // Dépendance jQuery si vous l'utilisez
+        $this->version,
+        true // Charger le script dans le footer
+    );
+}
     // Ajout de la variable de requête pour l'identifiant de l'utilisateur
     public function tmsm_add_query_vars($vars)
     {

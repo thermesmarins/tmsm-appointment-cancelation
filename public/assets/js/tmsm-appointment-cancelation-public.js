@@ -1,0 +1,1 @@
+console.log('TMSM Appointment Cancelation Public JS Loaded');
