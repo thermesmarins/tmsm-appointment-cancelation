@@ -15,8 +15,16 @@
  define( 'TMSM_APPOINTMENT_CANCELATION_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
  define( 'TMSM_APPOINTMENT_CANCELATION_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
- register_activation_hook( __FILE__, 'activate_tmsm_aquos_spa_booking' );
-register_deactivation_hook( __FILE__, 'deactivate_tmsm_aquos_spa_booking' );
+ require_once plugin_dir_path( __FILE__ ) . 'includes/class-tmsm-appointment-cancelation-activator.php';
+ // Enregistrement du hook d'activation
+// On appelle la méthode statique 'activate' de la classe 'Tmsm_Appointment_Cancelation_Activator'
+register_activation_hook( __FILE__, array( 'Tmsm_Appointment_Cancelation_Activator', 'activate' ) );
+// --- Correction pour la désactivation aussi ---
+// Vous devrez aussi définir la méthode 'deactivate' dans votre classe Activator
+// ou dans une nouvelle classe Deactivator si vous voulez suivre cette structure.
+// Pour l'instant, je vais supposer que vous allez la mettre dans Tmsm_Appointment_Cancelation_Activator
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-tmsm-appointment-cancelation-deactivator.php';
+register_deactivation_hook( __FILE__, array( 'Tmsm_Appointment_Cancelation_deactivator', 'deactivate' ) );
 
 require plugin_dir_path( __FILE__ ) . 'includes/class-tmsm-appointment-cancelation.php';
 
