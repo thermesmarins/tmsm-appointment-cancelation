@@ -167,10 +167,13 @@ class Tmsm_Appointment_Cancelation_Public
 
             $site_id = $this->aquos_api_handler->get_aquos_site_id();
 
+
 // todo: vérifier la présence de la date et de la signature dans l'url
             if ($fonctionnal_id) {
                 // Ici, nous allons récupérer et afficher les rendez-vous de l'utilisateur
-                $appointments = $this->tmsm_get_user_appointments($fonctionnal_id); // Fonction à créer
+                // $appointments = $this->tmsm_get_user_appointments($fonctionnal_id); // Fonction à créer
+                $appointments = $this->aquos_api_handler->get_user_appointments();
+                error_log('Rendez-vous récupérés : ' . print_r($appointments, true)); // Log pour vérifier les rendez-vous récupérés
                 // todo traitement des ids multiples de rendez-vous
                 // $output = '<h2>Vos Rendez-vous</h2>';
                 $output = '<p>Voici la liste de vos rendez-vous : pour l\'utilisateur ' . $fonctionnal_id . '  avec le token  : ' . $aquos_appointment_signature . '</p>';
@@ -203,19 +206,6 @@ class Tmsm_Appointment_Cancelation_Public
         return $content; // Retourner le contenu original si ce n'est pas notre page
     }
 
-    // Fonction temporaire pour simuler la récupération des rendez-vous
-    public function tmsm_get_user_appointments($fonctionnal_id)
-    {
-        // Dans la réalité, vous interrogeriez la base de données ici
-        // en utilisant l'identifiant de l'utilisateur pour récupérer ses rendez-vous.
-        // Pour l'exemple, nous allons retourner un tableau vide ou quelques objets factices.
-        // Exemple de données factices :
-        return [
-            (object) ['ID' => 1, 'date' => '2025-05-10', 'appointment_id' => 10],
-            (object) ['ID' => 2, 'date' => '2025-05-15', 'appointment_id' => 20],
-        ];
-        // return []; // Retourner un tableau vide si aucun rendez-vous
-    }
 
 }
 

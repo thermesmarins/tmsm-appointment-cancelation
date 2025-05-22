@@ -124,4 +124,86 @@ class Tmsm_Appointment_Cancelation_Aquos
         $date = new DateTime($this->aquos_appointment_date);
         return $date->format('Ymd');
     }
+
+    /**
+     * Methode publique pour récupérer les rendez-vous de l'utilsateur de la journée depuis Aquos
+     *
+     * @return array
+     */
+    public function get_user_appointments() 
+    {
+        //  Faire la requête à l'API Aquos pour récupérer les rendez-vous de l'utilisateur
+        // Récuperer le résultat de l'API et le transformer en tableau d'objets
+        
+        $appointments = $this->get_daily_appointments();
+        if (empty($appointments)) {
+            return [
+            (object) ['ID' => 1, 'date' => '2025-05-10', 'appointment_id' => 10],
+            (object) ['ID' => 2, 'date' => '2025-05-15', 'appointment_id' => 20],
+        ];
+        } else {
+            return $appointments;
+        }
+        
+    }
+    /**
+     * Methode privée pour récupérer la signature du rendez-vous pour l'appel vers Aquos
+     *
+     * @return void
+     */
+    private function get_daily_appointments()
+    {
+            $site_id =  $this->aquos_site_id; // mettre 10 pour les tests
+            $appointment_id =  $this->aquos_appointment_id; // Faire les appels dans postman pour récupérer les rendez-vous
+            $date =  $this->aquos_appointment_date;
+			$url = $this->aquos_daily_appointment_url;
+            $appointment_signature = $this->aquos_appointment_signature;
+			$delete_appointment_array = array(
+				'id_site' => $site_id,
+				'appointment_id' => $appointment_id,
+                'appointment_date' => $date,
+                'appointment_signature' => $appointment_signature,
+			);
+			$json_body = json_encode($delete_appointment_array);
+			$signature =  $this->generate_hmac_signature($json_body);
+
+    }
+    /** Generate HMAC signature
+	 *
+	 * @param string $json_body
+	 * @return string
+	 */
+	private function generate_hmac_signature($json_body)
+	{
+		$secret_token = get_option('tmsm_aquos_spa_booking_deleteaquossecret');
+		$hmacSignature = hash_hmac('sha256', $json_body, $this->aquos_security_token, true);
+		return base64_encode($hmacSignature);
+	}
+    /**
+     * Private function to get the appointments from Aquos
+     *
+     * @param [string] $json_body
+     * @param [string] $signature
+     * @return void
+     */
+   private function get_appointments_from_aquos($json_body, $signature)
+    {
+        $response = wp_remote_get($this->aquos_daily_appointment_url, array(
+            'method' => 'GET',
+            'body' => $json_body,
+            'headers' => array(
+                'Content-Type' => 'application/json',
+                'X-Signature' => $signature,
+            ),
+        ));
+
+        if (is_wp_error($response)) {
+            return [];
+        }
+
+        $body = wp_remote_retrieve_body($response);
+        return json_decode($body,true);
+    }
+
+    // todo annulation des rendez-vous méthode delete
 }
