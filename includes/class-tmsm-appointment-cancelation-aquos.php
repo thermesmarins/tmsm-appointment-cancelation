@@ -24,6 +24,7 @@ class Tmsm_Appointment_Cancelation_Aquos
         $this->aquos_appointment_date = $appointment_date;
         $this->aquos_fonctionnal_id = $fonctionnal_id;
         $this->aquos_appointment_signature = $aquos_appointment_signature;
+        
         error_log('Aquos appointment signature: ' . $this->aquos_appointment_signature);
         $this->aquos_appointment_date = $appointment_date;
         $options = get_option('tmsm_appointment_cancelation_options');
@@ -34,7 +35,8 @@ class Tmsm_Appointment_Cancelation_Aquos
 
         // Initialiser le tableau des sites ici, car il est lié à cette logique
         $this->aquos_sites = array(
-            'AQREN' => 0,
+            // Mettre 10 pour les tests
+            'AQREN' => 10,
             'AQVE'  => 2,
             'AQNA'  => 5,
         );
@@ -121,8 +123,38 @@ class Tmsm_Appointment_Cancelation_Aquos
      */
     public function get_aquos_appointment_date()
     {
-        $date = new DateTime($this->aquos_appointment_date);
+        $date = DateTime::createFromFormat('Y.m.d', $this->aquos_appointment_date);
         return $date->format('Ymd');
+    }
+    public function get_formatted_date($date) 
+    {
+        $date_obj = DateTime::createFromFormat('Ymd', $date);
+        // return $date->format('d-m-Y');
+        if ($date_obj) {
+    $mois_fr = array(
+        1  => 'janvier',
+        2  => 'février',
+        3  => 'mars',
+        4  => 'avril',
+        5  => 'mai',
+        6  => 'juin',
+        7  => 'juillet',
+        8  => 'août',
+        9  => 'septembre',
+        10 => 'octobre',
+        11 => 'novembre',
+        12 => 'décembre'
+    );
+
+    $jour = $date_obj->format('d');
+    $mois_numero = (int)$date_obj->format('n'); // 'n' pour le mois sans zéro initial (1 à 12)
+    $annee = $date_obj->format('Y');
+
+    return $jour . ' ' . $mois_fr[$mois_numero] . ' ' . $annee;
+} else {
+    error_log("Erreur de format de date pour: " . $date);
+    return null;
+}
     }
 
     /**
@@ -138,11 +170,12 @@ class Tmsm_Appointment_Cancelation_Aquos
         $appointments = $this->get_daily_appointments();
         if (empty($appointments)) {
             return [
-            (object) ['ID' => 1, 'date' => '2025-05-10', 'appointment_id' => 10],
-            (object) ['ID' => 2, 'date' => '2025-05-15', 'appointment_id' => 20],
+            (object) ['id' => 1, 'appointment_date' => '2025-05-10', 'appointment' => "massage 1"],
+            (object) ['id' => 2, 'appointment_date' => '2025-05-15', 'appointment' => "massage 2"],
         ];
         } else {
-            return $appointments;
+          
+            return $appointments->appointments ;
         }
         
     }
@@ -155,18 +188,19 @@ class Tmsm_Appointment_Cancelation_Aquos
     {
             $site_id =  $this->aquos_site_id; // mettre 10 pour les tests
             $appointment_id =  $this->aquos_appointment_id; // Faire les appels dans postman pour récupérer les rendez-vous
-            $date =  $this->aquos_appointment_date;
+            $date =  $this->get_aquos_appointment_date(); // date du jour
 			$url = $this->aquos_daily_appointment_url;
             $appointment_signature = $this->aquos_appointment_signature;
-			$delete_appointment_array = array(
+			$appointment_array = array(
 				'id_site' => $site_id,
 				'appointment_id' => $appointment_id,
                 'appointment_date' => $date,
                 'appointment_signature' => $appointment_signature,
 			);
-			$json_body = json_encode($delete_appointment_array);
+			$json_body = json_encode($appointment_array);
 			$signature =  $this->generate_hmac_signature($json_body);
-
+            $response = $this->get_appointments_from_aquos($json_body, $signature);
+            return $response;
     }
     /** Generate HMAC signature
 	 *
@@ -188,21 +222,73 @@ class Tmsm_Appointment_Cancelation_Aquos
      */
    private function get_appointments_from_aquos($json_body, $signature)
     {
-        $response = wp_remote_get($this->aquos_daily_appointment_url, array(
-            'method' => 'GET',
-            'body' => $json_body,
-            'headers' => array(
-                'Content-Type' => 'application/json',
-                'X-Signature' => $signature,
-            ),
-        ));
+        $url = $this->aquos_daily_appointment_url;
+        $headers = [
+			'Content-Type' => 'application/json; charset=utf-8',
+			'X-Signature' => $signature,
+			'Cache-Control' => 'no-cache',
+		];
+ if (json_last_error() !== JSON_ERROR_NONE) {
+        error_log('Erreur d\'encodage JSON pour l\'appel API: ' . json_last_error_msg());
+        return new WP_Error('json_encode_error', 'Impossible d\'encoder les données en JSON.');
+    }
+ $curl = curl_init();
 
-        if (is_wp_error($response)) {
-            return [];
-        }
+curl_setopt_array($curl, array(
+  CURLOPT_URL => $url,
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => '',
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 0,
+  CURLOPT_FOLLOWLOCATION => true,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => 'GET',
+  CURLOPT_POSTFIELDS =>$json_body,
+  CURLOPT_HTTPHEADER => array(
+    'X-Signature: ' . $signature,
+    'Content-Type: application/json'
+  ),
+        // Pour les environnements de développement local avec des certificats auto-signés.
+        // À DÉSACTIVER en PRODUCTION pour des raisons de sécurité, ou à configurer correctement !
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => false,
+    ));
 
-        $body = wp_remote_retrieve_body($response);
-        return json_decode($body,true);
+    // 4. Exécuter la requête
+    $response = curl_exec($curl);
+
+    // 5. Gérer les erreurs cURL
+    if (curl_errno($curl)) {
+        $error_msg = curl_error($curl);
+        error_log('Erreur cURL lors de l\'appel API: ' . $error_msg);
+        curl_close($curl);
+        return new WP_Error('curl_error', 'Erreur lors de l\'appel API cURL: ' . $error_msg);
+    }
+
+    // 6. Obtenir le code de statut HTTP de la réponse
+    $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+    // 7. Fermer la session cURL
+    curl_close($curl);
+
+    // 8. Décoder la réponse JSON
+    $data = json_decode($response);
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        error_log('Erreur de décodage JSON de la réponse API: ' . json_last_error_msg());
+        error_log('Réponse reçue (non-JSON): ' . $response); // Log la réponse complète pour débogage
+        return new WP_Error('json_decode_error', 'Impossible de décoder la réponse JSON de l\'API.');
+    }
+
+    // 9. Gérer les codes de statut HTTP de la réponse API
+    if ($http_code >= 200 && $http_code < 300) {
+        return $data; // Succès : retourne les données décodées
+    } else {
+        error_log("L'API a retourné un code d'erreur HTTP $http_code. Réponse brute: $response");
+        // Vous pouvez analyser $data ici pour obtenir un message d'erreur plus spécifique de l'API
+        $api_error_message = isset($data->message) ? $data->message : 'Erreur inconnue de l\'API.';
+        return new WP_Error('api_response_error', 'L\'API a retourné une erreur HTTP: ' . $http_code . ' - ' . $api_error_message, $data);
+    }
     }
 
     // todo annulation des rendez-vous méthode delete

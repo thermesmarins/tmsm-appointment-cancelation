@@ -31,6 +31,21 @@ class Tmsm_Appointment_Cancelation_Public
     private $aquos_api_handler = null;
 
     /**
+     * Cache pour stocker les rendez-vous de l'utilisateur après le premier appel API.
+     * @since    1.0.0
+     * @access   private
+     * @var      array|WP_Error|null $user_appointments_cache
+     */
+    private $user_appointments_cache = null;
+
+    /**
+     * Indicateur pour savoir si les rendez-vous ont déjà été chargés depuis l'API.
+     * @since    1.0.0
+     * @access   private
+     * @var      bool $appointments_loaded
+     */
+    private $appointments_loaded = false;
+    /**
      * Constructor.
      *
      * @param string $plugin_name The name of the plugin.
@@ -71,9 +86,9 @@ class Tmsm_Appointment_Cancelation_Public
     // Ajout de la variable de requête pour l'identifiant de l'utilisateur
     public function tmsm_add_query_vars($vars)
     {
-        $vars[] = 'fonctionnal_id';
-        $vars[] = 'aquos_appointment_signature';
-        $vars[] = 'date';
+        $vars[] = 'f';
+        $vars[] = 't';
+        $vars[] = 'd';
         return $vars;
     }
     // add_filter( 'query_vars', 'tmsm_add_query_vars' );
@@ -91,8 +106,8 @@ class Tmsm_Appointment_Cancelation_Public
 
             // Récupérer les données nécessaires depuis l'URL (GET, pas get_query_var ici car nous sommes sur 'init')
             $appointment_id = intval($_GET['appointment_id']);
-            $fonctionnal_id = isset($_GET['fonctionnal_id']) ? sanitize_text_field($_GET['fonctionnal_id']) : '';
-            $token_from_url = isset($_GET['token']) ? sanitize_text_field($_GET['token']) : ''; // Le token de l'URL, s'il y en a un
+            $fonctionnal_id = isset($_GET['f']) ? sanitize_text_field($_GET['f']) : '';
+            // $token_from_url = isset($_GET['token']) ? sanitize_text_field($_GET['token']) : ''; // Le token de l'URL, s'il y en a un
 
             // Récupérer le token de sécurité depuis les options du plugin (le vrai token pour l'API)
             $options = get_option('tmsm_appointment_cancelation_options');
@@ -103,7 +118,7 @@ class Tmsm_Appointment_Cancelation_Public
 
             // Récupérer l'ID numérique de l'utilisateur et l'ID du site pour l'appel API
             // $numeric_user_id = $aquos_api_handler_for_action->get_aquos_numeric_id();
-            $site_id_from_token = $aquos_api_handler_for_action->get_aquos_site_id();
+            $site_id = isset($_GET['site_id']) ? sanitize_text_field($_GET['site_id']) : '';;
 
             error_log('*** LOGIQUE D\'ANNULATION EXÉCUTÉE (action init) ***'); // Ce log ne s'affichera qu'une seule fois si cette action est déclenchée
             // error_log("Tentative d'annulation du rendez-vous ID: $appointment_id pour utilisateur: $numeric_user_id sur site: $site_id_from_token");
@@ -128,7 +143,7 @@ class Tmsm_Appointment_Cancelation_Public
     // Action à exécuter lorsque notre point de terminaison est visité
     public function tmsm_handle_user_appointments_content($content)
     {
-        // https://aquatonic.local/rennes/vos-rendez-vous/?fonctionnal_id=12345AQREN&aquos_appointment_signature=1641616111155&date=2025-05-10
+        // https://aquatonic.local/rennes/vos-rendez-vous/?f=304555AQREN&s=btwHqtVtGZ&d=2025.05.25
         global $wp_query;
         // Varioble à récupérer dans l'url (date de rendez-vous, id fonctionnel, token)
 
@@ -151,10 +166,17 @@ class Tmsm_Appointment_Cancelation_Public
             // mais sur la page de destination et pas sur la page d'accueil.
             return $output;
         }
-        if (is_page('vos-rendez-vous')) {
-            $fonctionnal_id = get_query_var('fonctionnal_id');
-            $aquos_appointment_signature = get_query_var('aquos_appointment_signature');
-            $date = get_query_var('date');
+        if (is_page('vos-rendez-vous') || is_page('rdv')) {
+            $fonctionnal_id = get_query_var('f');
+            $aquos_appointment_signature = get_query_var('t');
+            if (!empty($aquos_appointment_signature) && strpos($aquos_appointment_signature, ' ') !== false) {
+                // Si des espaces sont trouvés, nous les reconvertissons en '+'.
+                $aquos_appointment_signature = str_replace(' ', '+', $aquos_appointment_signature);
+                error_log('Signature après correction des espaces -> + : ' . $aquos_appointment_signature);
+            }
+            error_log('Signature de rendez-vous : ' . $aquos_appointment_signature . ' est de type ' . gettype($aquos_appointment_signature));
+            $date = get_query_var('d');
+            $date_to_show = '';
             error_log('Date de rendez-vous : ' . $date . ' est de type ' . gettype($date));
             if (is_null($this->aquos_api_handler)) {
                 $this->aquos_api_handler = new Tmsm_Appointment_Cancelation_Aquos($fonctionnal_id, $aquos_appointment_signature, $date);
@@ -163,36 +185,45 @@ class Tmsm_Appointment_Cancelation_Public
                 error_log('ID Numérique Extrait : ' . $this->aquos_api_handler->get_aquos_appointment_id());
                 error_log('Code de Site Extrait : ' . $this->aquos_api_handler->get_aquos_site_id());
                 error_log('Date Extrait : ' . $this->aquos_api_handler->get_aquos_appointment_date());
+                
             }
 
             $site_id = $this->aquos_api_handler->get_aquos_site_id();
-
-
 // todo: vérifier la présence de la date et de la signature dans l'url
             if ($fonctionnal_id) {
-                // Ici, nous allons récupérer et afficher les rendez-vous de l'utilisateur
-                // $appointments = $this->tmsm_get_user_appointments($fonctionnal_id); // Fonction à créer
-                $appointments = $this->aquos_api_handler->get_user_appointments();
-                error_log('Rendez-vous récupérés : ' . print_r($appointments, true)); // Log pour vérifier les rendez-vous récupérés
+ // Récupérer les rendez-vous UNIQUEMENT si ce n'est pas déjà fait
+            if ( ! $this->appointments_loaded ) {
+                $this->user_appointments_cache = $this->aquos_api_handler->get_user_appointments();
+                $this->appointments_loaded = true;
+                error_log('Rendez-vous récupérés (une seule fois): ' . print_r($this->user_appointments_cache, true));
+            }
+             // Utiliser les rendez-vous en cache
+            $appointments = $this->user_appointments_cache;
+            $date_to_show = $this->aquos_api_handler->get_formatted_date( $this->aquos_api_handler->get_aquos_appointment_date());
+
                 // todo traitement des ids multiples de rendez-vous
-                // $output = '<h2>Vos Rendez-vous</h2>';
-                $output = '<p>Voici la liste de vos rendez-vous : pour l\'utilisateur ' . $fonctionnal_id . '  avec le token  : ' . $aquos_appointment_signature . '</p>';
+                $output = '<h3>Réservation du ' . esc_html($date_to_show) . '</h3>';
+                // $output = '<p>Voici la liste de vos rendez-vous : pour l\'utilisateur ' . $fonctionnal_id . '  avec le token  : ' . $aquos_appointment_signature . '</p>';
                 if (! empty($appointments)) {
-                    $output .= '<ul>';
-                    foreach ($appointments as $appointment) {
-                        $cancel_url = add_query_arg(
+
+                    $cancel_url = add_query_arg(
                             array(
                                 'action'         => 'annuler_rendez_vous',
-                                'appointment_id' => $appointment->appointment_id, // Si appointment_id est un tableau, cela doit être géré
-                                'nonce'          => wp_create_nonce('annuler_rendez_vous_' . $appointment->appointment_id),
-                                'fonctionnal_id' => $fonctionnal_id, // Pour repasser l'ID fonctionnel si besoin
-                                'aquos_appointment_signature'=> $aquos_appointment_signature, // Pour repasser le token de l'URL si besoin
+                                'appointment_id' => $appointments[0]->id, // Si appointment_id est un tableau, cela doit être géré
+                                'nonce'          => wp_create_nonce('annuler_rendez_vous_' .$appointments[0]->id),
                                 'site_id'        => $site_id,
                             )
                         );
+                    // $output .= '<h3>Vos Rendez-vous : </h3>';
+                    $output .= '<ul>';
+                    foreach ($appointments as $appointment) {
+                        
                         // Formattez ici l'affichage de chaque rendez-vous
-                        $output .= '<li>ID du Rendez-vous : ' . esc_html($appointment->ID) . ' le ' . esc_html($appointment->date) . '<a href="' . esc_url($cancel_url) . '" class="cancel-button" style="padding-left: 10px;">' . 'Annuler ce rendez-vous' . '</a></li>';
+                        $output .= '<li>' . esc_html($appointment->appointment) .  '</li>';
+                        // todo conditionner le pluriel..
+                       
                     }
+                     $output .= '<a href="' . esc_url($cancel_url) . '" class="elementor-button elementor-size-sm " style="margin-top: 10px;">' . 'Annuler ce rendez-vous' . '</a>';
                     $output .= '</ul>';
                 } else {
                     $output .= '<p>Aucun rendez-vous trouvé pour cet utilisateur.</p>';
