@@ -117,7 +117,7 @@ class Tmsm_Appointment_Cancelation_Public
             if (! isset($_GET['nonce']) || ! wp_verify_nonce($_GET['nonce'], 'annuler_rendez_vous_' . $_GET['appointment_id'])) {
                 wp_die('<p>Nonce invalide. Action non autorisée.</p>', __('Error', 'tmsm-appointment-cancelation'));
             }
-            error_log('appointment_id : ' . print_r(explode(',', $_GET['appointment_id']), true) . ' de type ' . gettype(explode(',', $_GET['appointment_id'])));
+           
 
             $appointment_ids = explode(',', $_GET['appointment_id']);
             $fonctionnal_id = isset($_GET['f']) ? sanitize_text_field($_GET['f']) : '';
@@ -125,24 +125,25 @@ class Tmsm_Appointment_Cancelation_Public
             $plugin_api_token = isset($options['aquos_appointment_cancellation_token']) ? esc_attr($options['aquos_appointment_cancellation_token']) : '';
             $aquos_cancel_appointments = new Tmsm_Appointment_Cancelation_Aquos($fonctionnal_id, $plugin_api_token);
             $site_id = isset($_GET['site_id']) ? sanitize_text_field($_GET['site_id']) : '';
+           
 
             error_log('*** LOGIQUE D\'ANNULATION EXÉCUTÉE (action init) ***'); // Ce log ne s'affichera qu'une seule fois si cette action est déclenchée
             $cancel_status = false; // Initialiser le statut d'annulation
-            $cancel_errors = []; // Initialiser un tableau pour les erreurs d'annulation
-            foreach ($appointment_ids as $appointment_id) {
-                $appointment_id = intval($appointment_id); // Assurez-vous que l'ID est un entier
+            $aquos_cancel_appointments->cancel_appointment($appointment_ids); // Appeler la méthode d'annulation de l'API
+            // foreach ($appointment_ids as $appointment_id) {
+            //     $appointment_id = intval($appointment_id); // Assurez-vous que l'ID est un entier
                 // TODO: Appeler la méthode d'annulation de l'API
-                if ($appointment_id > 0 && !empty($site_id)) {
+                // if ($appointment_id > 0 && !empty($site_id)) {
                     // Appeler la méthode d'annulation de l'API
                     // Récuperer le statut de l'annulation vérifier qu'il n'y pas d'erreur et valider le succès
                     // $cancel_status = $aquos_cancel_appointments->cancel_appointment($appointment_id, $site_id);
                     // creer la méthode get_errors dans Tmsm_Appointment_Cancelation_Aquos
                     // $cancel_errors [] = $aquos_cancel_appointments->get_errors();
-                    error_log("Annulation du rendez-vous ID: $appointment_id pour utilisateur: $fonctionnal_id sur site: $site_id. Statut: " . ($cancel_status ? 'Succès' : 'Échec'));
-                } else {
-                    error_log("ID de rendez-vous invalide ou site ID manquant pour l'annulation.");
-                }
-            }
+                    // error_log("Annulation du rendez-vous ID: $appointment_id pour utilisateur: $fonctionnal_id sur site: $site_id. Statut: " . ($cancel_status ? 'Succès' : 'Échec'));
+                // } else {
+                //     error_log("ID de rendez-vous invalide ou site ID manquant pour l'annulation.");
+                // }
+            // }
             // Exemple: $aquos_api_handler_for_action->cancel_appointment($appointment_id, $numeric_user_id, $site_id_from_token);
 
             // Rediriger l'utilisateur après l'action pour éviter les soumissions multiples
@@ -216,7 +217,6 @@ class Tmsm_Appointment_Cancelation_Public
                 $date_to_show = $this->aquos_api_handler->get_formatted_date($this->aquos_api_handler->get_aquos_appointment_date());
                 $appointments_ids = [];
                 $output = '<h3>Réservation du ' . esc_html($date_to_show) . '</h3>';
-                error_log("Rendez-vous : ". print_r($appointments, true));
                 if (! empty($appointments) && isset($appointments[0]->id)) {
                     $output .= '<ul>';
                     foreach ($appointments as $appointment) {
