@@ -216,6 +216,7 @@ class Tmsm_Appointment_Cancelation_Public
                 $date_to_show = $this->aquos_api_handler->get_formatted_date($this->aquos_api_handler->get_aquos_appointment_date());
                 $appointments_ids = [];
                 $output = '<h3>Réservation du ' . esc_html($date_to_show) . '</h3>';
+                error_log("Rendez-vous : ". print_r($appointments, true));
                 if (! empty($appointments) && isset($appointments[0]->id)) {
                     $output .= '<ul>';
                     foreach ($appointments as $appointment) {

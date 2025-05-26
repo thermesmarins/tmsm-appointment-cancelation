@@ -196,7 +196,7 @@ class Tmsm_Appointment_Cancelation_Aquos
 			);
 			$json_body = json_encode($appointment_array);
 			$signature =  $this->generate_hmac_signature($json_body);
-            $response = $this->get_appointments_from_aquos($json_body, $signature);
+            $response = $this->_make_aquos_api_request($json_body, $signature);
             return $response;
     }
     /** Generate HMAC signature
@@ -217,7 +217,7 @@ class Tmsm_Appointment_Cancelation_Aquos
      * @param [string] $signature
      * @return void
      */
-   private function get_appointments_from_aquos($json_body, $signature)
+   private function _make_aquos_api_request($json_body, $signature, $method = 'POST')
     {
         $url = $this->aquos_daily_appointment_url;
         $headers = [
@@ -225,67 +225,36 @@ class Tmsm_Appointment_Cancelation_Aquos
 			'X-Signature' => $signature,
 			'Cache-Control' => 'no-cache',
 		];
- if (json_last_error() !== JSON_ERROR_NONE) {
-        error_log('Erreur d\'encodage JSON pour l\'appel API: ' . json_last_error_msg());
-        return new WP_Error('json_encode_error', 'Impossible d\'encoder les données en JSON.');
-    }
- $curl = curl_init();
 
-curl_setopt_array($curl, array(
-  CURLOPT_URL => $url,
-  CURLOPT_RETURNTRANSFER => true,
-  CURLOPT_ENCODING => '',
-  CURLOPT_MAXREDIRS => 10,
-  CURLOPT_TIMEOUT => 0,
-  CURLOPT_FOLLOWLOCATION => true,
-  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-  CURLOPT_CUSTOMREQUEST => 'POST',
-  CURLOPT_POSTFIELDS =>$json_body,
-  CURLOPT_HTTPHEADER => array(
-    'X-Signature: ' . $signature,
-    'Content-Type: application/json'
-  ),
-        // Pour les environnements de développement local avec des certificats auto-signés.
-        // À DÉSACTIVER en PRODUCTION pour des raisons de sécurité, ou à configurer correctement !
-        CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_SSL_VERIFYHOST => false,
-    ));
 
-    // 4. Exécuter la requête
-    $response = curl_exec($curl);
-
-    // 5. Gérer les erreurs cURL
-    if (curl_errno($curl)) {
-        $error_msg = curl_error($curl);
-        error_log('Erreur cURL lors de l\'appel API: ' . $error_msg);
-        curl_close($curl);
-        return new WP_Error('curl_error', 'Erreur lors de l\'appel API cURL: ' . $error_msg);
-    }
-
-    // 6. Obtenir le code de statut HTTP de la réponse
-    $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
-    // 7. Fermer la session cURL
-    curl_close($curl);
-
-    // 8. Décoder la réponse JSON
-    $data = json_decode($response);
-
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        error_log('Erreur de décodage JSON de la réponse API: ' . json_last_error_msg());
-        error_log('Réponse reçue (non-JSON): ' . $response); // Log la réponse complète pour débogage
-        return new WP_Error('json_decode_error', 'Impossible de décoder la réponse JSON de l\'API.');
-    }
-
-    // 9. Gérer les codes de statut HTTP de la réponse API
-    if ($http_code >= 200 && $http_code < 300) {
-        return $data; // Succès : retourne les données décodées
-    } else {
-        error_log("L'API a retourné un code d'erreur HTTP $http_code. Réponse brute: $response");
-        // Vous pouvez analyser $data ici pour obtenir un message d'erreur plus spécifique de l'API
-        $api_error_message = isset($data->message) ? $data->message : 'Erreur inconnue de l\'API.';
-        return new WP_Error('api_response_error', 'L\'API a retourné une erreur HTTP: ' . $http_code . ' - ' . $api_error_message, $data);
-    }
+        $response = wp_remote_request($url, array(
+            'method' => $method,
+            'body' => $json_body,
+            'headers' => $headers,
+            'timeout' => 30, // Timeout de 30 secondes
+            'sslverify' => false, // Désactiver la vérification SSL pour les environnements de développement
+        ));
+        // Vérifier si la requête a échoué
+        if (is_wp_error($response)) {
+            error_log('Erreur lors de l\'appel API Aquos: ' . $response->get_error_message());
+            return new WP_Error('api_request_error', 'Erreur lors de l\'appel API Aquos: ' . $response->get_error_message());
+        }
+        // Vérifier le code de statut HTTP
+        $http_code = wp_remote_retrieve_response_code($response);
+        if ($http_code < 200 || $http_code >= 300) {
+            error_log("L'API Aquos a retourné un code d'erreur HTTP $http_code. Réponse brute: " . wp_remote_retrieve_body($response));
+            return new WP_Error('api_response_error', 'L\'API Aquos a retourné une erreur HTTP: ' . $http_code);
+        }
+        // Décoder la réponse JSON
+        $response_body = wp_remote_retrieve_body($response);
+        $data = json_decode($response_body);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            error_log('Erreur de décodage JSON de la réponse API Aquos: ' . json_last_error_msg());
+            error_log('Réponse reçue (non-JSON): ' . $response_body); // Log la réponse complète pour débogage
+            return new WP_Error('json_decode_error', 'Impossible de décoder la réponse JSON de l\'API Aquos.');
+        }
+        // Retourner les données décodées
+        return $data;
     }
 
     // todo annulation des rendez-vous méthode delete
