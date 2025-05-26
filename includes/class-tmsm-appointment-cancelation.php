@@ -113,7 +113,9 @@ class Tmsm_Appointment_Cancelation
 		 * side of the site.
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-tmsm-appointment-cancelation-public.php';
-		// Inclure la classe d'interaction avec l'API Aquos
+		/**
+		 * The class responsible for handling appointment cancelation with Aquos.
+		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-tmsm-appointment-cancelation-aquos.php';
 
 		$this->loader = new Tmsm_Appointment_Cancelation_Loader();
@@ -150,14 +152,6 @@ class Tmsm_Appointment_Cancelation
 
 		$this->loader->add_filter('query_vars', $plugin_public, 'tmsm_add_query_vars');
 
-		$this->loader->add_filter('the_content', $plugin_public, 'tmsm_handle_user_appointments_content');
-
-		// // Enqueue the public-facing stylesheets and scripts.
-		// $this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		// $this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
-
-		// // Add the shortcode for the appointment cancelation form.
-		// $this->loader->add_shortcode( 'tmsm_appointment_cancelation', $plugin_public, 'render_cancelation_form' );
 	}
 
 	/**
