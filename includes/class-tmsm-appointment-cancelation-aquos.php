@@ -168,13 +168,10 @@ class Tmsm_Appointment_Cancelation_Aquos
         // Récuperer le résultat de l'API et le transformer en tableau d'objets
         
         $appointments = $this->get_daily_appointments();
-        if (empty($appointments)) {
-            return [
-            (object) ['id' => 1, 'appointment_date' => '2025-05-10', 'appointment' => "massage 1"],
-            (object) ['id' => 2, 'appointment_date' => '2025-05-15', 'appointment' => "massage 2"],
-        ];
+        error_log('Appointments from Aquos: ' . print_r($appointments, true));
+        if (empty($appointments) || isset($appointments->ErrorMessage)) {
+            return []; // Si pas de rendez-vous ou erreur, retourner un tableau vide
         } else {
-          
             return $appointments->appointments ;
         }
         

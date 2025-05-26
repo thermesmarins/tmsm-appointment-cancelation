@@ -4,7 +4,7 @@ Ce plugin WordPress permet d'annuler un rendez-vous pris par téléphone via l'A
 
 ## Fonctionnalités
 
-- Ajoute une page "Rendez-vous" dans le backoffice WordPress.
+- Ajoute une page "rdv" dans le backoffice WordPress.
 - Permet d'annuler un rendez-vous en appelant l'API Aquos.
 
 ## Installation

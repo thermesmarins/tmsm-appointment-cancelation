@@ -143,7 +143,7 @@ class Tmsm_Appointment_Cancelation_Public
     // Action à exécuter lorsque notre point de terminaison est visité
     public function tmsm_handle_user_appointments_content($content)
     {
-        // https://aquatonic.local/rennes/vos-rendez-vous/?f=304555AQREN&s=btwHqtVtGZ&d=2025.05.25
+        // https://aquatonic.local/rennes/vos-rendez-vous/?f=304555AQREN&t=btwHqtVtGZ&d=2025.05.25
         global $wp_query;
         // Varioble à récupérer dans l'url (date de rendez-vous, id fonctionnel, token)
 
@@ -166,7 +166,8 @@ class Tmsm_Appointment_Cancelation_Public
             // mais sur la page de destination et pas sur la page d'accueil.
             return $output;
         }
-        if (is_page('vos-rendez-vous') || is_page('rdv')) {
+        // todo gerer la page direct 
+        if (is_page('vos-rendez-vous') || is_page('rdv') && isset($wp_query->query_vars['f']) && isset($wp_query->query_vars['t']) && isset($wp_query->query_vars['d'])) {
             $fonctionnal_id = get_query_var('f');
             $aquos_appointment_signature = get_query_var('t');
             if (!empty($aquos_appointment_signature) && strpos($aquos_appointment_signature, ' ') !== false) {
@@ -204,7 +205,7 @@ class Tmsm_Appointment_Cancelation_Public
                 // todo traitement des ids multiples de rendez-vous
                 $output = '<h3>Réservation du ' . esc_html($date_to_show) . '</h3>';
                 // $output = '<p>Voici la liste de vos rendez-vous : pour l\'utilisateur ' . $fonctionnal_id . '  avec le token  : ' . $aquos_appointment_signature . '</p>';
-                if (! empty($appointments)) {
+                if (! empty($appointments) && isset($appointments[0]->id)) {
 
                     $cancel_url = add_query_arg(
                             array(
@@ -226,17 +227,16 @@ class Tmsm_Appointment_Cancelation_Public
                      $output .= '<a href="' . esc_url($cancel_url) . '" class="elementor-button elementor-size-sm " style="margin-top: 10px;">' . 'Annuler ce rendez-vous' . '</a>';
                     $output .= '</ul>';
                 } else {
-                    $output .= '<p>Aucun rendez-vous trouvé pour cet utilisateur.</p>';
+                    $output .= '<p>Il n\' y a pas de rendez-vous à afficher, veuillez nous contacter si besoin.</p>';
                 }
                 return $output;
             } else {
                 return '<p>Identifiant d\'utilisateur non valide.</p>';
             }
         }
+        $output = '<p>Cette page n\'est pas accessible directement ! Vous devez disposez d\'un lien valide pour y accéder.</p>';
 
-        return $content; // Retourner le contenu original si ce n'est pas notre page
+        return $output; // Retourner le contenu original si ce n'est pas notre page
     }
-
-
-}
+}   
 
