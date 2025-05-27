@@ -121,33 +121,19 @@ class Tmsm_Appointment_Cancelation_Public
 
             $appointment_ids = explode(',', $_GET['appointment_id']);
             $fonctionnal_id = isset($_GET['f']) ? sanitize_text_field($_GET['f']) : '';
+            $date = isset($_GET['d']) ? sanitize_text_field($_GET['d']) : '';
             $options = get_option('tmsm_appointment_cancelation_options');
             $plugin_api_token = isset($options['aquos_appointment_cancellation_token']) ? esc_attr($options['aquos_appointment_cancellation_token']) : '';
             $aquos_cancel_appointments = new Tmsm_Appointment_Cancelation_Aquos($fonctionnal_id, $plugin_api_token);
             $site_id = isset($_GET['site_id']) ? sanitize_text_field($_GET['site_id']) : '';
-           
-
-            error_log('*** LOGIQUE D\'ANNULATION EXÉCUTÉE (action init) ***'); // Ce log ne s'affichera qu'une seule fois si cette action est déclenchée
-            $cancel_status = false; // Initialiser le statut d'annulation
-            $aquos_cancel_appointments->cancel_appointment($appointment_ids); // Appeler la méthode d'annulation de l'API
-            // foreach ($appointment_ids as $appointment_id) {
-            //     $appointment_id = intval($appointment_id); // Assurez-vous que l'ID est un entier
-                // TODO: Appeler la méthode d'annulation de l'API
-                // if ($appointment_id > 0 && !empty($site_id)) {
-                    // Appeler la méthode d'annulation de l'API
-                    // Récuperer le statut de l'annulation vérifier qu'il n'y pas d'erreur et valider le succès
-                    // $cancel_status = $aquos_cancel_appointments->cancel_appointment($appointment_id, $site_id);
-                    // creer la méthode get_errors dans Tmsm_Appointment_Cancelation_Aquos
-                    // $cancel_errors [] = $aquos_cancel_appointments->get_errors();
-                    // error_log("Annulation du rendez-vous ID: $appointment_id pour utilisateur: $fonctionnal_id sur site: $site_id. Statut: " . ($cancel_status ? 'Succès' : 'Échec'));
-                // } else {
-                //     error_log("ID de rendez-vous invalide ou site ID manquant pour l'annulation.");
-                // }
-            // }
-            // Exemple: $aquos_api_handler_for_action->cancel_appointment($appointment_id, $numeric_user_id, $site_id_from_token);
-
+           $can_cancel = $aquos_cancel_appointments->can_cancel_appointment($date);
+            if (! $can_cancel) {
+                wp_die('<p>Vous ne pouvez pas annuler ce rendez-vous car la date limite est dépassée. Veuillez nous contacter si besoin.</p>', __('Error', 'tmsm-appointment-cancelation'));
+            }
+            $cancel_status = false; 
+            $cancel_status = $aquos_cancel_appointments->cancel_appointment($appointment_ids);
             // Rediriger l'utilisateur après l'action pour éviter les soumissions multiples
-            $redirect_url = remove_query_arg(array('action', 'appointment_id', 'nonce'));
+            $redirect_url = remove_query_arg(array('action', 'appointment_id', 'nonce', 'f', 't', 'd', 'site_id'));
             // Ajouter le statut de l'annulation
             if ($cancel_status) {
                 $redirect_url = add_query_arg('cancel_status', 'success', $redirect_url);
@@ -155,17 +141,22 @@ class Tmsm_Appointment_Cancelation_Public
                 $redirect_url = add_query_arg('cancel_status', 'error', $redirect_url);
             }
             wp_redirect($redirect_url);
-            exit; // Très important de terminer l'exécution ici après une redirection
+            exit; 
         }
     }
 
-    // Action à exécuter lorsque notre point de terminaison est visité
+    /**
+     * Handle the content for the user appointments page.
+     * This method checks if the current page is the user appointments page,
+     * retrieves the appointment data, and formats it for display.
+     *
+     * @param string $content The original content of the page.
+     * @return string The modified content with appointment information.
+     */
     public function tmsm_handle_user_appointments_content($content)
     {
         // https://aquatonic.local/rennes/vos-rendez-vous/?f=304555AQREN&t=btwHqtVtGZ&d=2025.05.25
         global $wp_query;
-        // Varioble à récupérer dans l'url (date de rendez-vous, id fonctionnel, token)
-
         $output = ''; // Initialiser la sortie
         if (isset($_GET['cancel_status'])) {
             $cancel_status = sanitize_text_field($_GET['cancel_status']);
@@ -176,13 +167,9 @@ class Tmsm_Appointment_Cancelation_Public
                 $output .= '</div>';
             } elseif ('error' === $cancel_status) {
                 $output .= '<div class="tmsm-notification tmsm-notification-error">';
-                $output .= '<p>Une erreur est survenue lors de l\'annulation de votre rendez-vous. Veuillez réessayer.</p>';
+                $output .= '<p>Une erreur est survenue lors de l\'annulation de votre rendez-vous. Veuillez nous contacter.</p>';
                 $output .= '</div>';
             }
-            // Nettoyer le paramètre d'URL pour qu'il ne reste pas si la page est rafraîchie manuellement
-            // Note: Une redirection est une meilleure pratique pour cela, mais si vous voulez qu'il disparaisse après un rafraîchissement manuel
-            // vous devriez faire une redirection JavaScript après l'affichage, ou utiliser les transients comme discuté précédemment
-            // mais sur la page de destination et pas sur la page d'accueil.
             return $output;
         }
         // todo gerer la page direct 
@@ -206,7 +193,6 @@ class Tmsm_Appointment_Cancelation_Public
             }
 
             $site_id = $this->aquos_api_handler->get_aquos_site_id();
-            // todo: vérifier la présence de la date et de la signature dans l'url
             if ($fonctionnal_id) {
                 if (! $this->appointments_loaded) {
                     $this->user_appointments_cache = $this->aquos_api_handler->get_user_appointments();
@@ -231,6 +217,9 @@ class Tmsm_Appointment_Cancelation_Public
                             'site_id'        => $site_id,
                         )
                     );
+                    if (count($appointment_ids) > 1) {
+                        $output .= '<p class="tmsm-notification-warning">En cliquant sur le bouton ci-dessous vous annulez tous les rendez-vous de la journée. Pour toutes questions, veuillez nous contacter</p>';
+                    } 
                     $output .= '<a href="' . esc_url($cancel_url) . '" class="elementor-button elementor-size-sm " style="margin-top: 10px;">' . 'Annuler ce rendez-vous' . '</a>';
                     $output .= '</ul>';
                 } else {
@@ -241,6 +230,6 @@ class Tmsm_Appointment_Cancelation_Public
                 return '<p>Identifiant d\'utilisateur non valide.</p>';
             }
         }
-        return  $output = '<p>Cette page n\'est pas accessible directement ! Vous devez disposez d\'un lien valide pour y accéder.</p>';
+        return  $content;
     }
 }

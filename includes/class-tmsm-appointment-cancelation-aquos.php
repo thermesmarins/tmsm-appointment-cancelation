@@ -198,6 +198,31 @@ class Tmsm_Appointment_Cancelation_Aquos
         $response = $this->_make_aquos_api_request($json_body, $signature);
         return $response;
     }
+    public function can_cancel_appointment($date) {
+        $date_now = new DateTime();
+        $date_appointment = DateTime::createFromFormat('Y.m.d', $date);
+        $limit_date = $this->aquos_appointment_delay;
+        if (!$date_appointment) {
+            error_log('Erreur de format de date pour: ' . $date);
+            return false; // Date invalide
+        }
+        // Calculer la différence entre la date actuelle et la date du rendez-vous
+        $interval = $date_now->diff($date_appointment);
+        // Vérifier si la différence est inférieure ou égale à la limite de temps
+        if ($interval->days > $limit_date || ($interval->days == $limit_date && $interval->h > 0)) {
+            error_log('Le rendez-vous peut être annulé. Différence: ' . $interval->days . ' jours et ' . $interval->h . ' heures.');
+            return true;
+        } else {
+            error_log('Le rendez-vous ne peut pas être annulé. Différence: ' . $interval->days . ' jours et ' . $interval->h . ' heures.');
+            return false; // Le rendez-vous ne peut pas être annulé
+        }
+    }
+    /**
+     * Méthode publique pour annuler un ou plusieurs rendez-vous
+     *
+     * @param array $appointment_id
+     * @return bool|WP_Error
+     */
     public function cancel_appointment(array $appointment_id)
     {
         $site_id = $this->aquos_site_id;
@@ -227,19 +252,32 @@ class Tmsm_Appointment_Cancelation_Aquos
                 'id_site' => $this->aquos_site_id,
                 'appointment_id' => $id_int,
             );
-            // Convertir les données en JSON
             $json_body = json_encode($data);
-            error_log('Data to cancel appointment: ' . print_r($json_body, true));
-            // Générer la signature HMAC
             $signature = $this->generate_hmac_signature($json_body);
-            error_log('Generated HMAC signature: ' . $signature);
-            $method = 'DELETE'; // Utiliser DELETE pour annuler le rendez-vous
-            // Faire la requête à l'API Aquos pour annuler le rendez-vous
+            $method = 'DELETE'; 
             $response[] = $this->_make_aquos_api_request($json_body, $signature, $method);
         }
         error_log('Response from Aquos API after cancellation: ' . print_r($response, true));
-        error_log('IDs cancelled: ' . print_r($ids, true));
-        // return $response;
+        $error = array();
+        foreach ($response as $res) {
+            error_log('response error: ' . print_r($res->Status, true) . gettype($res->Status));
+            if ($res->Status == true) {
+                $error[] = false;
+            } else {
+                $error [] = true;
+                error_log('Erreur lors de l\'annulation du rendez-vous: ' . print_r($res, true));
+                return new WP_Error('cancellation_error', 'Erreur lors de l\'annulation du rendez-vous: ' . print_r($res, true));
+            }
+        }
+        if (in_array(true, $error)) {
+            error_log('Une ou plusieurs annulations ont échoué.');
+            return false; // Au moins une annulation a échoué
+        } else {
+               error_log('Toutes les annulations ont réussi.');
+               return true; // Toutes les annulations ont réussi
+           }
+
+        
 
     }
     /** Generate HMAC signature
@@ -249,7 +287,7 @@ class Tmsm_Appointment_Cancelation_Aquos
      */
     private function generate_hmac_signature($json_body)
     {
-        $secret_token = get_option('tmsm_aquos_spa_booking_deleteaquossecret');
+        $secret_token = $this->aquos_security_token;
         $hmacSignature = hash_hmac('sha256', $json_body, $this->aquos_security_token, true);
         return base64_encode($hmacSignature);
     }

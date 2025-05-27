@@ -97,7 +97,7 @@ class Tmsm_Appointment_Cancelation_Admin
             $sanitized_input['aquos_appointment_cancellation_token'] = sanitize_text_field($input['aquos_appointment_cancellation_token']);
         }
         if (isset($input['aquos_appointment_cancellation_deadline'])) {
-            $sanitized_input['aquos_appointment_cancellation_deadline'] = sanitize_text_field($input['aquos_appointment_cancellation_deadline']);
+            $sanitized_input['aquos_appointment_cancellation_deadline'] = absint($input['aquos_appointment_cancellation_deadline']);
         }
         return $sanitized_input;
     }

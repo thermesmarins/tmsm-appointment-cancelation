@@ -24,6 +24,11 @@
     color: #a94442;
     border-color: #ebccd1;
 }
+.tmsm-notification-warning {
+    background-color: #f2dede; /* Rouge pâle pour erreur */
+    color: #6b341e;
+    border-color: #ebccd1;
+}
 
 .tmsm-close-notification {
     cursor: pointer;
