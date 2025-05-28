@@ -128,7 +128,7 @@ class Tmsm_Appointment_Cancelation_Public
             $site_id = isset($_GET['site_id']) ? sanitize_text_field($_GET['site_id']) : '';
            $can_cancel = $aquos_cancel_appointments->can_cancel_appointment($date);
             if (! $can_cancel) {
-                wp_die('<p>Vous ne pouvez pas annuler ce rendez-vous car la date limite est dépassée. Veuillez nous contacter si besoin.</p>', __('Error', 'tmsm-appointment-cancelation'));
+                wp_die(__('<p>Vous ne pouvez pas annuler ce rendez-vous car la date limite est dépassée. Veuillez nous contacter si besoin.</p>', 'tmsm-appointment-cancelation'), __('Error', 'tmsm-appointment-cancelation'));
             }
             $cancel_status = false; 
             $cancel_status = $aquos_cancel_appointments->cancel_appointment($appointment_ids);
@@ -163,11 +163,13 @@ class Tmsm_Appointment_Cancelation_Public
 
             if ('success' === $cancel_status) {
                 $output .= '<div class="tmsm-notification tmsm-notification-success">';
-                $output .= '<p>Votre rendez-vous a été annulé avec succès !</p>';
+                $output .= '<p>' . __('Votre rendez-vous a été annulé avec succès !', 'tmsm-appointment-cancelation') . '</p>';
+                $output .= '</div>';
+                $output .= '<p>' . __('Votre rendez-vous a été annulé avec succès !', 'tmsm-appointment-cancelation') . '</p>';
                 $output .= '</div>';
             } elseif ('error' === $cancel_status) {
                 $output .= '<div class="tmsm-notification tmsm-notification-error">';
-                $output .= '<p>Une erreur est survenue lors de l\'annulation de votre rendez-vous. Veuillez nous contacter.</p>';
+                $output .= '<p>' . __('Une erreur est survenue lors de l\'annulation de votre rendez-vous. Veuillez nous contacter.', 'tmsm-appointment-cancelation') . '</p>';
                 $output .= '</div>';
             }
             return $output;
@@ -202,7 +204,7 @@ class Tmsm_Appointment_Cancelation_Public
                 $appointments = $this->user_appointments_cache;
                 $date_to_show = $this->aquos_api_handler->get_formatted_date($this->aquos_api_handler->get_aquos_appointment_date());
                 $appointments_ids = [];
-                $output = '<h3>Réservation du ' . esc_html($date_to_show) . '</h3>';
+                $output = __('<h3>Réservation du ', 'tmsm-appointment-cancelation') . esc_html($date_to_show) . '</h3>';
                 if (! empty($appointments) && isset($appointments[0]->id)) {
                     $output .= '<ul>';
                     foreach ($appointments as $appointment) {
@@ -218,16 +220,16 @@ class Tmsm_Appointment_Cancelation_Public
                         )
                     );
                     if (count($appointment_ids) > 1) {
-                        $output .= '<p class="tmsm-notification-warning">En cliquant sur le bouton ci-dessous vous annulez tous les rendez-vous de la journée. Pour toutes questions, veuillez nous contacter</p>';
+                        $output .= '<p class="tmsm-notification-warning">' . __('En cliquant sur le bouton ci-dessous vous annulez tous les rendez-vous de la journée. Pour toutes questions, veuillez nous contacter', 'tmsm-appointment-cancelation') .'</p>';
                     } 
-                    $output .= '<a href="' . esc_url($cancel_url) . '" class="elementor-button elementor-size-sm " style="margin-top: 10px;">' . 'Annuler ce rendez-vous' . '</a>';
+                    $output .= '<a href="' . esc_url($cancel_url) . '" class="elementor-button elementor-size-sm " style="margin-top: 10px;">' . __('Annuler ce rendez-vous','tmsm-appointment-cancelation') . '</a>';
                     $output .= '</ul>';
                 } else {
-                    $output .= '<p>Il n\' y a pas de rendez-vous à cette date, veuillez nous contacter si besoin.</p>';
+                    $output .= '<p>' . __('Il n\' y a pas de rendez-vous à cette date, veuillez nous contacter si besoin.', 'tmsm-appointment-cancelation') . '</p>';
                 }
                 return $output;
             } else {
-                return '<p>Identifiant d\'utilisateur non valide.</p>';
+                return '<p>'. __('Identifiant d\'utilisateur non valide.', 'tmsm-appointment-cancelation').'</p>';
             }
         }
         return  $content;

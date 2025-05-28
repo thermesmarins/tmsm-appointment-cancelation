@@ -75,7 +75,7 @@ class Tmsm_Appointment_Cancelation
 		$this->plugin_name = 'tmsm-appointment-cancelation';
 
 		$this->load_dependencies();
-		// $this->set_locale();
+		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 	}
@@ -117,11 +117,21 @@ class Tmsm_Appointment_Cancelation
 		 * The class responsible for handling appointment cancelation with Aquos.
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-tmsm-appointment-cancelation-aquos.php';
+		/**
+		 * The class responsible for handling appointment cancelation with Aquos.
+		 */
+		require_once plugin_dir_path(dirname(__FILE__)) . 'languages/class-tmsm-appointment-cancelation-i18n.php';
 
 		$this->loader = new Tmsm_Appointment_Cancelation_Loader();
 	}
 
 
+	private function set_locale()
+	{
+		$plugin_i18n = new Tmsm_Appointment_Cancelation_i18n();
+
+		$this->loader->add_action('init', $plugin_i18n, 'load_plugin_textdomain');
+	}
 
 	/**
 	 * Register all of the hooks related to the admin area functionality
