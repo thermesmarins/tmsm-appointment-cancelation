@@ -217,6 +217,63 @@ class Tmsm_Appointment_Cancelation_Aquos
             return false; // Le rendez-vous ne peut pas être annulé
         }
     }
+    // Todo gestion de l'heure de rendez-vous
+    /**
+ * Vérifie si un rendez-vous peut être annulé en fonction d'un délai horaire.
+ *
+ * @param string $appointment_date_str La date du rendez-vous au format YYYYMMDD (ex: '20250613').
+ * @param string $appointment_time_str L'heure du rendez-vous au format HHMM (ex: '1400').
+ * @param int    $delay_hours Le délai en heures avant le rendez-vous (ex: 24 ou 48).
+ * @return bool True si le rendez-vous peut être annulé, false sinon.
+ */
+public function can_appointment_be_cancelled(
+    $appointment_date_str,
+    $appointment_time_str,
+    $delay_hours
+) {
+    // 1. Obtenir l'heure actuelle
+    $now = new DateTime();
+
+    // 2. Créer l'objet DateTime complet pour le rendez-vous
+    // Assure-toi que appointment_time_str est bien HHMM (ex: "1400")
+    $appointment_datetime_combined = $appointment_date_str . $appointment_time_str . '00'; // Ajoute les secondes si manquantes
+    
+    // Le format 'YmdHis' correspond à YYYYMMDDHHMMSS
+    $appointment_start_time = DateTime::createFromFormat('YmdHis', $appointment_datetime_combined);
+
+    if (!$appointment_start_time) {
+        error_log('Erreur: Impossible de parser la date/heure du rendez-vous: ' . $appointment_datetime_combined);
+        return false; // Date ou heure de rendez-vous invalide
+    }
+
+    // 3. Calculer la date limite d'annulation
+    // On clone l'objet pour ne pas modifier l'original $appointment_start_time
+    // On soustrait le délai en heures du temps du rendez-vous.
+    $cancel_deadline_interval = new DateInterval('PT' . $delay_hours . 'H');
+    $cancellation_deadline = (clone $appointment_start_time)->sub($cancel_deadline_interval);
+error_log(
+        'Date limite d\'annulation: ' . $cancellation_deadline->format('Y-m-d H:i') .
+        ' (Rendez-vous commence le ' . $appointment_start_time->format('Y-m-d H:i') . ')'
+    );
+    // 4. Comparer l'heure actuelle avec la date limite d'annulation
+    if ($now < $cancellation_deadline) {
+        // L'heure actuelle est AVANT la date limite d'annulation
+        error_log(
+            'Le rendez-vous (débute le ' . $appointment_start_time->format('Y-m-d H:i') . ') ' .
+            'peut être annulé. Date limite d\'annulation: ' . $cancellation_deadline->format('Y-m-d H:i') .
+            '. Heure actuelle: ' . $now->format('Y-m-d H:i')
+        );
+        return true;
+    } else {
+        // L'heure actuelle est APRES ou ÉGALE à la date limite d'annulation
+        error_log(
+            'Le rendez-vous (débute le ' . $appointment_start_time->format('Y-m-d H:i') . ') ' .
+            'ne peut PAS être annulé. Date limite d\'annulation: ' . $cancellation_deadline->format('Y-m-d H:i') .
+            '. Heure actuelle: ' . $now->format('Y-m-d H:i')
+        );
+        return false;
+    }
+}
     /**
      * Méthode publique pour annuler un ou plusieurs rendez-vous
      *

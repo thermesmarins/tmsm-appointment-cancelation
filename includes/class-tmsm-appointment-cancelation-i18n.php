@@ -28,10 +28,12 @@ class TMSM_Appointment_Cancelation_i18n {
      * @since 1.0.0
      */
     public function load_plugin_textdomain() {
+        // Définir le fuseau horaire pour le plugin
+        date_default_timezone_set('Europe/Paris');
         load_plugin_textdomain(
             'tmsm-appointment-cancelation',
             false,
-            dirname( plugin_basename( __FILE__ ) ) . '/languages/'
+           dirname( dirname( plugin_basename( __FILE__ ) )) . '/languages/'
         );
     }
 }

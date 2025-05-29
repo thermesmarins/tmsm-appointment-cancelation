@@ -120,7 +120,7 @@ class Tmsm_Appointment_Cancelation
 		/**
 		 * The class responsible for handling appointment cancelation with Aquos.
 		 */
-		require_once plugin_dir_path(dirname(__FILE__)) . 'languages/class-tmsm-appointment-cancelation-i18n.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-tmsm-appointment-cancelation-i18n.php';
 
 		$this->loader = new Tmsm_Appointment_Cancelation_Loader();
 	}
