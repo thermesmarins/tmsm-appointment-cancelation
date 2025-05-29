@@ -1,0 +1,107 @@
+# Blank WordPress Pot
+# Copyright 2014 ...
+# This file is distributed under the GNU General Public License v3 or later.
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Blank WordPress Pot v1.0.0\n"
+"Report-Msgid-Bugs-To: Translator Name <translations@example.com>\n"
+"POT-Creation-Date: 2025-05-29 09:56+0200\n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: Your Team <translations@example.com>\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Textdomain-Support: yesX-Generator: Poedit 1.6.4\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: "
+"__;_e;esc_html_e;esc_html_x:1,2c;esc_html__;esc_attr_e;esc_attr_x:1,2c;esc_attr__;_ex:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2;_x:1,2c;_n:1,2;_n_noop:1,2;__ngettext:1,2;__ngettext_noop:1,2;_c,_nc:4c,1,2\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-Bookmarks: \n"
+"X-Generator: Poedit 3.6\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: admin/class-tmsm-appointment-cancelation-admin.php:48
+msgid "Global Settings"
+msgstr "Paramètres Globaux"
+
+#: admin/class-tmsm-appointment-cancelation-admin.php:55
+msgid "Deadline Cancelation"
+msgstr "Date limite d'annulation"
+
+#: admin/class-tmsm-appointment-cancelation-admin.php:62
+msgid "Cancelation Url"
+msgstr "Url d'annulation Aquos"
+
+#: admin/class-tmsm-appointment-cancelation-admin.php:69
+msgid "Daily Url"
+msgstr "Url de récupération de Rendez-Vous"
+
+#: admin/class-tmsm-appointment-cancelation-admin.php:76
+msgid "Cancelation Token"
+msgstr "Token d'annulation d'Aquos"
+
+#: admin/class-tmsm-appointment-cancelation-admin.php:121
+#: admin/class-tmsm-appointment-cancelation-admin.php:122
+msgid "Appointment Cancelation"
+msgstr "Annulation de Rendez-Vous"
+
+#: admin/class-tmsm-appointment-cancelation-admin.php:146
+msgid "Save Parameters"
+msgstr "Sauvegarder"
+
+#: admin/class-tmsm-appointment-cancelation-admin.php:154
+msgid "Global settings options for appointment cancelation"
+msgstr "Paramètres d'options d'annulation de rendez-vous"
+
+#: public/class-tmsm-appointment-cancelation-public.php:121
+#: public/class-tmsm-appointment-cancelation-public.php:134
+msgid "Error"
+msgstr "Erreur"
+
+#: public/class-tmsm-appointment-cancelation-public.php:134
+msgid ""
+"You can not cancel this appointment because the limit is overdue. Please "
+"contact us."
+msgstr ""
+"Vous ne pouvez pas annuler ce rendez-vous car la date limite est atteinte. "
+"Veuillez nous contacter."
+
+#: public/class-tmsm-appointment-cancelation-public.php:169
+msgid "Your appointment has been successfully canceled!"
+msgstr "Votre rendez-vous est annulé."
+
+#: public/class-tmsm-appointment-cancelation-public.php:173
+msgid "An error occurred when cancelling your appointment. Please contact us."
+msgstr ""
+"Une erreur est survenue lors de l'annulation, s'il vous plaît contactez "
+"nous."
+
+#: public/class-tmsm-appointment-cancelation-public.php:207
+msgid "Reservation for "
+msgstr "Réservation du "
+
+#: public/class-tmsm-appointment-cancelation-public.php:223
+msgid ""
+"Clicking on the button below will cancel all appointments for the day. If "
+"you have any questions, please contact us"
+msgstr ""
+"En cliquant sur le bouton ci-dessous vous annulez tous les rendez-vous de "
+"la journée."
+
+#: public/class-tmsm-appointment-cancelation-public.php:225
+msgid "Cancel this appointment"
+msgstr "Annuler le rendez-vous"
+
+#: public/class-tmsm-appointment-cancelation-public.php:228
+msgid "There are no appointments on this date, please contact us if needed."
+msgstr ""
+"Il n'y a pas de rendez-vous pour cette date, en cas de problème veuillez "
+"nous contacter."
+
+#: public/class-tmsm-appointment-cancelation-public.php:232
+msgid "Your login is invalid."
+msgstr "L'utilisateur n'est pas reconnu."
