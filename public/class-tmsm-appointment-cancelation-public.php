@@ -115,33 +115,42 @@ class Tmsm_Appointment_Cancelation_Public
      */
     public function handle_cancel_appointment_action()
     {
-        if (isset($_GET['action']) && $_GET['action'] === 'annuler_rendez_vous' && isset($_GET['appointment_id'])) {
+        error_log('POST ACTION: ' . print_r($_POST, true));
+        if (isset($_POST['action']) && $_POST['action'] === 'annuler_rendez_vous' && isset($_POST['appointment_ids'])) {
             // Vérifier le nonce pour la sécurité
-            if (! isset($_GET['nonce']) || ! wp_verify_nonce($_GET['nonce'], 'annuler_rendez_vous_' . $_GET['appointment_id'])) {
-                wp_die('<p>Nonce invalide. Action non autorisée.</p>', __('Error', 'tmsm-appointment-cancelation'));
+            if (! isset($_POST['tmsm_cancel_nonce']) || ! wp_verify_nonce($_POST['tmsm_cancel_nonce'], 'annuler_rendez_vous_' . $_POST['appointment_ids'])) {
+                // wp_die('<p>Nonce invalide. Action non autorisée.</p>', __('Error', 'tmsm-appointment-cancelation'));
+                wp_redirect(add_query_arg('cancel_status', 'nonce_error', home_url('/vos-rendez-vous/')));
+            exit;
             }
            
 
-            $appointment_ids = explode(',', $_GET['appointment_id']);
-            $fonctionnal_id = isset($_GET['f']) ? sanitize_text_field($_GET['f']) : '';
-            $date = isset($_GET['d']) ? sanitize_text_field($_GET['d']) : '';
+            $appointment_ids = explode(',', $_POST['appointment_ids']);
+            $fonctionnal_id = isset($_POST['fonctionnal_id']) ? sanitize_text_field($_POST['fonctionnal_id']) : '';
+            $date = isset($_POST['date']) ? sanitize_text_field($_POST['date']) : '';
             $options = get_option('tmsm_appointment_cancelation_options');
             $plugin_api_token = isset($options['aquos_appointment_cancellation_token']) ? esc_attr($options['aquos_appointment_cancellation_token']) : '';
             $aquos_cancel_appointments = new Tmsm_Appointment_Cancelation_Aquos($fonctionnal_id, $plugin_api_token);
-            $site_id = isset($_GET['site_id']) ? sanitize_text_field($_GET['site_id']) : '';
-           $can_cancel = $aquos_cancel_appointments->can_cancel_appointment($date);
-            if (! $can_cancel) {
-                wp_die(__('<p>You can not cancel this appointment because the limit is overdue. Please contact us.</p>', 'tmsm-appointment-cancelation'), __('Error', 'tmsm-appointment-cancelation'));
-            }
+            $site_id = isset($_POST['site_id']) ? sanitize_text_field($_POST['site_id']) : '';
+            // ! A supprimer vu que c'est déjà checké lors de la récupération des rendez-vous
+        //    $can_cancel = $aquos_cancel_appointments->can_cancel_appointment($date);
+            // if (! $can_cancel) {
+            //     wp_die(__('<p>You can not cancel this appointment because the limit is overdue. Please contact us.</p>', 'tmsm-appointment-cancelation'), __('Error', 'tmsm-appointment-cancelation'));
+            // }
+
             $cancel_status = false; 
-            $cancel_status = $aquos_cancel_appointments->cancel_appointment($appointment_ids);
+            // $cancel_status = $aquos_cancel_appointments->cancel_appointment($appointment_ids);
+            // Récupérer l'email du champ du formulaire (toujours depuis $_POST)
+            $user_email = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
+            // TODO Ajouter la logique pour envoyer un email de confirmation à l'utilisateur
             // Rediriger l'utilisateur après l'action pour éviter les soumissions multiples
-            $redirect_url = remove_query_arg(array('action', 'appointment_id', 'nonce', 'f', 't', 'd', 'site_id'));
+            // $redirect_url = remove_query_arg(array('action', 'appointment_id', 'nonce', 'f', 't', 'd', 'site_id'));
+             $redirect_url_base = home_url('/vos-rendez-vous/');
             // Ajouter le statut de l'annulation
             if ($cancel_status) {
-                $redirect_url = add_query_arg('cancel_status', 'success', $redirect_url);
+                $redirect_url = add_query_arg('cancel_status', 'success', $redirect_url_base);
             } else {
-                $redirect_url = add_query_arg('cancel_status', 'error', $redirect_url);
+                $redirect_url = add_query_arg('cancel_status', 'error', $redirect_url_base);
             }
             wp_redirect($redirect_url);
             exit; 
@@ -158,7 +167,7 @@ class Tmsm_Appointment_Cancelation_Public
      */
     public function tmsm_handle_user_appointments_content($content)
     {
-        // https://aquatonic.local/rennes/vos-rendez-vous/?f=304555AQREN&t=btwHqtVtGZ&d=2025.05.25
+        // https://aquatonic.local/vos-rendez-vous/?f=304555AQREN&t=btwHqtVtGZ&d=2025.05.25
         global $wp_query;
         $output = ''; 
         if (isset($_GET['cancel_status'])) {
@@ -205,18 +214,19 @@ class Tmsm_Appointment_Cancelation_Public
                 $appointments = $this->user_appointments_cache;
                 $date_to_show = $this->aquos_api_handler->get_formatted_date($this->aquos_api_handler->get_aquos_appointment_date());
                 $appointments_ids = [];
-                $output = __('<h3> Reservation for ', 'tmsm-appointment-cancelation') . esc_html($date_to_show) . '</h3>';
+                $output = '<h3>'. esc_html__('Reservation for ', 'tmsm-appointment-cancelation') . esc_html($date_to_show) . '</h3>';
                 if (! empty($appointments) && isset($appointments[0]->id)) {
                     $output .= '<ul>';
                      $any_cancellable_appointment = false; // Flag pour savoir si au moins un RDV est annulable
+                     $current_user_email = $appointments[0]->email ?? ''; // Récupère l'email du premier RDV pour vérification
 // Todo gestion de l'heure de rendez-vous récupération de l'heure de rendez-vous depuis l'API
     // Récupère le délai d'annulation depuis les options de ton plugin
     $options = get_option('tmsm_appointment_cancelation_options');
-    $cancel_delay_hours = 24; // Valeur par défaut de 24h
+    $cancel_delay_hours = isset($options['aquos_appointment_cancellation_deadline']) ? $options['aquos_appointment_cancellation_deadline'] : 24; // Valeur par défaut de 24h
                     foreach ($appointments as $appointment) {
                         $output .= '<li>' . esc_html($appointment->appointment) .  '</li>';
                         $appointment_ids[] = $appointment->id; 
-                          $appointment_time_from_api = isset($appointment->appointment_time) ? $appointment->appointment_time : '1410'; // Utilise 00h00 si non disponible
+                          $appointment_time_from_api = isset($appointment->appointment_hour) ? $appointment->appointment_hour : '1410'; // Utilise 00h00 si non disponible
 // Todo gestion de l'heure de rendez-vous
         if ($this->aquos_api_handler->can_appointment_be_cancelled(
             $appointment->appointment_date,
@@ -237,12 +247,39 @@ class Tmsm_Appointment_Cancelation_Public
                             'site_id'        => $site_id,
                         )
                     );
+                    // if (count($appointment_ids) > 1) {
+                    //     $output .= '<p class="tmsm-notification-warning">' . __('Clicking on the button below will cancel all appointments for the day. If you have any questions, please contact us', 'tmsm-appointment-cancelation') .'</p>';
+                    // } 
+                    if ($any_cancellable_appointment) {
+                // Créer le formulaire d'annulation
+                // CHANGEMENT 1: method="post"
+                $output .= '<form id="tmsm-cancel-form" method="post" action="' . esc_url(home_url('/rdv/')) . '" style="margin-top: 20px;">';
+
+                // Tous les champs que vous aviez en hidden sont toujours nécessaires
+                $output .= '<input type="hidden" name="action" value="annuler_rendez_vous">';
+                $output .= '<input type="hidden" name="appointment_ids" value="' . implode(',', $appointment_ids) . '">';
+                $output .= '<input type="hidden" name="site_id" value="' . esc_attr($site_id) . '">';
+                $output .= '<input type="hidden" name="fonctionnal_id" value="' . esc_attr($fonctionnal_id) . '">';
+                $output .= '<input type="hidden" name="aquos_appointment_signature" value="' . esc_attr($aquos_appointment_signature) . '">';
+                $output .= '<input type="hidden" name="date" value="' . esc_attr($this->aquos_api_handler->get_aquos_appointment_date()) . '">';
+
+                // CHANGEMENT 2: Ajouter le champ nonce pour la sécurité POST
+                // Au lieu de créer un nonce dans le GET et de le passer en hidden,
+                // on utilise la fonction dédiée de WordPress pour les formulaires POST.
+                // Cela générera un champ hidden avec le nonce et l'action.
+                $output .= wp_nonce_field('annuler_rendez_vous_action', 'tmsm_cancel_nonce', true, false); // Nom de l'action pour le nonce, Nom du champ hidden, true pour echo, false pour ne pas être un champ d'admin par défaut
+                        $output .= '<p>';
+                        $output .= '<label for="tmsm_email_confirm">' . esc_html__('Email for confirmation:', 'tmsm-appointment-cancelation') . '</label><br>';
+                        $output .= '<input type="email" id="tmsm_email_confirm" name="email_confirm" value="' . esc_attr($current_user_email) . '" required style="width: 100%; max-width: 300px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">';
+                        $output .= '<p class="description">' . esc_html__('Enter the email address where you wish to receive the cancellation confirmation.', 'tmsm-appointment-cancelation') . '</p>';
+                        $output .= '</p>';
+
                     if (count($appointment_ids) > 1) {
                         $output .= '<p class="tmsm-notification-warning">' . __('Clicking on the button below will cancel all appointments for the day. If you have any questions, please contact us', 'tmsm-appointment-cancelation') .'</p>';
                     } 
-                    if ($any_cancellable_appointment) {
-                    $output .= '<a href="' . esc_url($cancel_url) . '" class="elementor-button elementor-size-sm " style="margin-top: 10px;">' . __('Cancel this appointment','tmsm-appointment-cancelation') . '</a>';
+                    $output .= '<button type="submit" class="elementor-button elementor-size-sm " style="margin-top: 10px;">' . __('Cancel this appointment','tmsm-appointment-cancelation') . '</button>';
                     $output .= '</ul>';
+                   
                     } else {
                         $output .= '<p>' . __('You cannot cancel this appointment because the cancellation deadline has passed. Please contact us if needed.', 'tmsm-appointment-cancelation') . '</p>';
                     }

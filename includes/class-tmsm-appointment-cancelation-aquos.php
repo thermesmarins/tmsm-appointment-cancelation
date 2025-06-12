@@ -198,25 +198,26 @@ class Tmsm_Appointment_Cancelation_Aquos
         $response = $this->_make_aquos_api_request($json_body, $signature);
         return $response;
     }
-    public function can_cancel_appointment($date) {
-        $date_now = new DateTime();
-        $date_appointment = DateTime::createFromFormat('Y.m.d', $date);
-        $limit_date = $this->aquos_appointment_delay;
-        if (!$date_appointment) {
-            error_log('Erreur de format de date pour: ' . $date);
-            return false; // Date invalide
-        }
-        // Calculer la différence entre la date actuelle et la date du rendez-vous
-        $interval = $date_now->diff($date_appointment);
-        // Vérifier si la différence est inférieure ou égale à la limite de temps
-        if ($interval->days > $limit_date || ($interval->days == $limit_date && $interval->h > 0)) {
-            error_log('Le rendez-vous peut être annulé. Différence: ' . $interval->days . ' jours et ' . $interval->h . ' heures.');
-            return true;
-        } else {
-            error_log('Le rendez-vous ne peut pas être annulé. Différence: ' . $interval->days . ' jours et ' . $interval->h . ' heures.');
-            return false; // Le rendez-vous ne peut pas être annulé
-        }
-    }
+    // Todo: voir si vraiment nécessaire car checké avant l'affichage du bouton d'annulation
+    // public function can_cancel_appointment($date) {
+    //     $date_now = new DateTime();
+    //     $date_appointment = DateTime::createFromFormat('Y.m.d', $date);
+    //     $limit_date = $this->aquos_appointment_delay;
+    //     if (!$date_appointment) {
+    //         error_log('Erreur de format de date pour: ' . $date);
+    //         return false; // Date invalide
+    //     }
+    //     // Calculer la différence entre la date actuelle et la date du rendez-vous
+    //     $interval = $date_now->diff($date_appointment);
+    //     // Vérifier si la différence est inférieure ou égale à la limite de temps
+    //     if ($interval->days > $limit_date || ($interval->days == $limit_date && $interval->h > 0)) {
+    //         error_log('Le rendez-vous peut être annulé. Différence: ' . $interval->days . ' jours et ' . $interval->h . ' heures.');
+    //         return true;
+    //     } else {
+    //         error_log('Le rendez-vous ne peut pas être annulé. Différence: ' . $interval->days . ' jours et ' . $interval->h . ' heures.');
+    //         return false; // Le rendez-vous ne peut pas être annulé
+    //     }
+    // }
     // Todo gestion de l'heure de rendez-vous
     /**
  * Vérifie si un rendez-vous peut être annulé en fonction d'un délai horaire.
