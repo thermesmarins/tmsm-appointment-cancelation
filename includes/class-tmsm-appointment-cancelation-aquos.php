@@ -18,41 +18,40 @@ class Tmsm_Appointment_Cancelation_Aquos
     private $aquos_site_id;
     private $aquos_sites;
     private $aquos_appointment_date;
+    private $customer_name;
 
     public function __construct($fonctionnal_id, $aquos_appointment_signature, $appointment_date = null)
     {
         $this->aquos_appointment_date = $appointment_date;
         $this->aquos_fonctionnal_id = $fonctionnal_id;
         $this->aquos_appointment_signature = $aquos_appointment_signature;
-
-        error_log('Aquos appointment signature: ' . $this->aquos_appointment_signature);
         $this->aquos_appointment_date = $appointment_date;
+
         $options = get_option('tmsm_appointment_cancelation_options');
         $this->aquos_cancelation_url = isset($options['aquos_appointment_cancellation_url']) ? esc_attr($options['aquos_appointment_cancellation_url']) : '';
         $this->aquos_appointment_delay = isset($options['aquos_appointment_cancellation_deadline']) ? esc_attr($options['aquos_appointment_cancellation_deadline']) : '';
         $this->aquos_daily_appointment_url = isset($options['aquos_appointment_daily_url']) ? esc_attr($options['aquos_appointment_daily_url']) : '';
         $this->aquos_security_token = isset($options['aquos_appointment_cancellation_token']) ? esc_attr($options['aquos_appointment_cancellation_token']) : '';
 
-        // Initialiser le tableau des sites ici, car il est lié à cette logique
         $this->aquos_sites = array(
-            // Mettre 10 pour les tests
+            // TODO Mettre 10 pour les tests
             'AQREN' => 10,
             'AQVE'  => 2,
             'AQNA'  => 5,
         );
         // Extraire l'ID numérique de l'ID fonctionnel
-        $this->aquos_appointment_id = $this->extract_numeric_id_from_fonctional_id($this->aquos_fonctionnal_id);
-        $site_code_extracted = $this->extract_site_code_from_token($this->aquos_fonctionnal_id);
+        $this->aquos_appointment_id = $this->extract_appointment_id_from_fonctional_id($this->aquos_fonctionnal_id);
+        $site_code_extracted = $this->extract_site_code_from_fonctionnal_id($this->aquos_fonctionnal_id);
         $this->aquos_site_id = $this->get_site_id_from_code($site_code_extracted);
     }
     /**
      * Extrait le code du site (lettres majuscules) d'un token.
      * C'est une méthode privée car elle est une aide interne à la classe.
      *
-     * @param string $token_full Le token complet (ex: "125456AQREN").
+     * @param string $aquos_fonctionnal_id Le token complet (ex: "125456AQREN").
      * @return string|null Le code du site (ex: "AQREN") ou null si non trouvé.
      */
-    private function extract_site_code_from_token($aquos_fonctionnal_id)
+    private function extract_site_code_from_fonctionnal_id($aquos_fonctionnal_id)
     {
         // L'expression régulière cherche une ou plusieurs lettres majuscules (A-Z)
         // à la fin de la chaîne ($).
@@ -70,7 +69,7 @@ class Tmsm_Appointment_Cancelation_Aquos
      * @param string $fonctional_id Le ID fonctionnel complet (ex: "156786AQREN").
      * @return int|null La partie numérique (ex: 156786) ou null si non trouvée.
      */
-    private function extract_numeric_id_from_fonctional_id($fonctional_id)
+    private function extract_appointment_id_from_fonctional_id($fonctional_id)
     {
         // L'expression régulière cherche une ou plusieurs chiffres (0-9)
         // au début de la chaîne (^)
@@ -115,6 +114,10 @@ class Tmsm_Appointment_Cancelation_Aquos
     public function get_aquos_security_token()
     {
         return $this->aquos_security_token;
+    }
+    public function get_customer_name()
+    {
+        return $this->customer_name;
     }
     /**
      * Méthode publique pour récupérer l'URL d'annulation Aquos.
@@ -164,14 +167,14 @@ class Tmsm_Appointment_Cancelation_Aquos
      */
     public function get_user_appointments()
     {
-        //  Faire la requête à l'API Aquos pour récupérer les rendez-vous de l'utilisateur
-        // Récuperer le résultat de l'API et le transformer en tableau d'objets
-
         $appointments = $this->get_daily_appointments();
         error_log('Appointments from Aquos: ' . print_r($appointments, true));
         if (empty($appointments) || isset($appointments->ErrorMessage)) {
             return []; // Si pas de rendez-vous ou erreur, retourner un tableau vide
         } else {
+           
+            $this->customer_name = $appointments->appointments[0]->customer; // Récupérer le nom du client
+            error_log('Customer name from Aquos: ' . $this->customer_name);
             return $appointments->appointments;
         }
     }
@@ -183,9 +186,8 @@ class Tmsm_Appointment_Cancelation_Aquos
     private function get_daily_appointments()
     {
         $site_id =  $this->aquos_site_id; // mettre 10 pour les tests
-        $appointment_id =  $this->aquos_appointment_id; // Faire les appels dans postman pour récupérer les rendez-vous
-        $date =  $this->get_aquos_appointment_date(); // date du jour
-        $url = $this->aquos_daily_appointment_url;
+        $appointment_id =  $this->aquos_appointment_id; 
+        $date =  $this->get_aquos_appointment_date();
         $appointment_signature = $this->aquos_appointment_signature;
         $appointment_array = array(
             'id_site' => $site_id,
@@ -198,83 +200,59 @@ class Tmsm_Appointment_Cancelation_Aquos
         $response = $this->_make_aquos_api_request($json_body, $signature);
         return $response;
     }
-    // Todo: voir si vraiment nécessaire car checké avant l'affichage du bouton d'annulation
-    // public function can_cancel_appointment($date) {
-    //     $date_now = new DateTime();
-    //     $date_appointment = DateTime::createFromFormat('Y.m.d', $date);
-    //     $limit_date = $this->aquos_appointment_delay;
-    //     if (!$date_appointment) {
-    //         error_log('Erreur de format de date pour: ' . $date);
-    //         return false; // Date invalide
-    //     }
-    //     // Calculer la différence entre la date actuelle et la date du rendez-vous
-    //     $interval = $date_now->diff($date_appointment);
-    //     // Vérifier si la différence est inférieure ou égale à la limite de temps
-    //     if ($interval->days > $limit_date || ($interval->days == $limit_date && $interval->h > 0)) {
-    //         error_log('Le rendez-vous peut être annulé. Différence: ' . $interval->days . ' jours et ' . $interval->h . ' heures.');
-    //         return true;
-    //     } else {
-    //         error_log('Le rendez-vous ne peut pas être annulé. Différence: ' . $interval->days . ' jours et ' . $interval->h . ' heures.');
-    //         return false; // Le rendez-vous ne peut pas être annulé
-    //     }
-    // }
-    // Todo gestion de l'heure de rendez-vous
+
     /**
- * Vérifie si un rendez-vous peut être annulé en fonction d'un délai horaire.
- *
- * @param string $appointment_date_str La date du rendez-vous au format YYYYMMDD (ex: '20250613').
- * @param string $appointment_time_str L'heure du rendez-vous au format HHMM (ex: '1400').
- * @param int    $delay_hours Le délai en heures avant le rendez-vous (ex: 24 ou 48).
- * @return bool True si le rendez-vous peut être annulé, false sinon.
- */
-public function can_appointment_be_cancelled(
-    $appointment_date_str,
-    $appointment_time_str,
-    $delay_hours
-) {
-    // 1. Obtenir l'heure actuelle
-    $now = new DateTime();
+     * Vérifie si un rendez-vous peut être annulé en fonction d'un délai horaire.
+     *
+     * @param string $appointment_date_str La date du rendez-vous au format YYYYMMDD (ex: '20250613').
+     * @param string $appointment_time_str L'heure du rendez-vous au format HHMM (ex: '1400').
+     * @param int    $delay_hours Le délai en heures avant le rendez-vous (ex: 24 ou 48).
+     * @return bool True si le rendez-vous peut être annulé, false sinon.
+     */
+    public function can_appointment_be_cancelled(
+        $appointment_date_str,
+        $appointment_time_str,
+        $delay_hours
+    ) {
+        // 1. Obtenir l'heure actuelle
+        $now = new DateTime();
 
-    // 2. Créer l'objet DateTime complet pour le rendez-vous
-    // Assure-toi que appointment_time_str est bien HHMM (ex: "1400")
-    $appointment_datetime_combined = $appointment_date_str . $appointment_time_str . '00'; // Ajoute les secondes si manquantes
-    
-    // Le format 'YmdHis' correspond à YYYYMMDDHHMMSS
-    $appointment_start_time = DateTime::createFromFormat('YmdHis', $appointment_datetime_combined);
+        // 2. Créer l'objet DateTime complet pour le rendez-vous
+        // Assure-toi que appointment_time_str est bien HHMM (ex: "1400")
+        $appointment_datetime_combined = $appointment_date_str . $appointment_time_str . '00'; // Ajoute les secondes si manquantes
 
-    if (!$appointment_start_time) {
-        error_log('Erreur: Impossible de parser la date/heure du rendez-vous: ' . $appointment_datetime_combined);
-        return false; // Date ou heure de rendez-vous invalide
+        // Le format 'YmdHis' correspond à YYYYMMDDHHMMSS
+        $appointment_start_time = DateTime::createFromFormat('YmdHis', $appointment_datetime_combined);
+
+        if (!$appointment_start_time) {
+            error_log('Erreur: Impossible de parser la date/heure du rendez-vous: ' . $appointment_datetime_combined);
+            return false; // Date ou heure de rendez-vous invalide
+        }
+
+        // 3. Calculer la date limite d'annulation
+        // On clone l'objet pour ne pas modifier l'original $appointment_start_time
+        // On soustrait le délai en heures du temps du rendez-vous.
+        $cancel_deadline_interval = new DateInterval('PT' . $delay_hours . 'H');
+        $cancellation_deadline = (clone $appointment_start_time)->sub($cancel_deadline_interval);
+        // 4. Comparer l'heure actuelle avec la date limite d'annulation
+        if ($now < $cancellation_deadline) {
+            // L'heure actuelle est AVANT la date limite d'annulation
+            error_log(
+                'Le rendez-vous (débute le ' . $appointment_start_time->format('Y-m-d H:i') . ') ' .
+                    'peut être annulé. Date limite d\'annulation: ' . $cancellation_deadline->format('Y-m-d H:i') .
+                    '. Heure actuelle: ' . $now->format('Y-m-d H:i')
+            );
+            return true;
+        } else {
+            // L'heure actuelle est APRES ou ÉGALE à la date limite d'annulation
+            error_log(
+                'Le rendez-vous (débute le ' . $appointment_start_time->format('Y-m-d H:i') . ') ' .
+                    'ne peut PAS être annulé. Date limite d\'annulation: ' . $cancellation_deadline->format('Y-m-d H:i') .
+                    '. Heure actuelle: ' . $now->format('Y-m-d H:i')
+            );
+            return false;
+        }
     }
-
-    // 3. Calculer la date limite d'annulation
-    // On clone l'objet pour ne pas modifier l'original $appointment_start_time
-    // On soustrait le délai en heures du temps du rendez-vous.
-    $cancel_deadline_interval = new DateInterval('PT' . $delay_hours . 'H');
-    $cancellation_deadline = (clone $appointment_start_time)->sub($cancel_deadline_interval);
-error_log(
-        'Date limite d\'annulation: ' . $cancellation_deadline->format('Y-m-d H:i') .
-        ' (Rendez-vous commence le ' . $appointment_start_time->format('Y-m-d H:i') . ')'
-    );
-    // 4. Comparer l'heure actuelle avec la date limite d'annulation
-    if ($now < $cancellation_deadline) {
-        // L'heure actuelle est AVANT la date limite d'annulation
-        error_log(
-            'Le rendez-vous (débute le ' . $appointment_start_time->format('Y-m-d H:i') . ') ' .
-            'peut être annulé. Date limite d\'annulation: ' . $cancellation_deadline->format('Y-m-d H:i') .
-            '. Heure actuelle: ' . $now->format('Y-m-d H:i')
-        );
-        return true;
-    } else {
-        // L'heure actuelle est APRES ou ÉGALE à la date limite d'annulation
-        error_log(
-            'Le rendez-vous (débute le ' . $appointment_start_time->format('Y-m-d H:i') . ') ' .
-            'ne peut PAS être annulé. Date limite d\'annulation: ' . $cancellation_deadline->format('Y-m-d H:i') .
-            '. Heure actuelle: ' . $now->format('Y-m-d H:i')
-        );
-        return false;
-    }
-}
     /**
      * Méthode publique pour annuler un ou plusieurs rendez-vous
      *
@@ -284,13 +262,14 @@ error_log(
     public function cancel_appointment(array $appointment_id)
     {
         $site_id = $this->aquos_site_id;
-      error_log('Aquos site ID cancel method: ' . $site_id); 
-      error_log('Appointment ID to cancel: ' . print_r($appointment_id, true));
+        error_log('Aquos site ID cancel method: ' . $site_id);
+        error_log('Appointment ID to cancel: ' . print_r($appointment_id, true));
         // Vérifier si l'ID de rendez-vous est défini
         if (empty($this->aquos_appointment_id)) {
             error_log('L\'ID de rendez-vous est vide ou non défini.');
             return new WP_Error('invalid_appointment_id', 'L\'ID de rendez-vous est vide ou non défini.');
         }
+        // todo : modifier pour la prod site = 10 pour les tests
         if ($site_id != 10 && !isset($this->aquos_sites[$site_id])) {
             error_log('L\'ID de site Aquos est invalide: ' . $site_id);
             return new WP_Error('invalid_site_id', 'L\'ID de site Aquos est invalide.');
@@ -312,7 +291,7 @@ error_log(
             );
             $json_body = json_encode($data);
             $signature = $this->generate_hmac_signature($json_body);
-            $method = 'DELETE'; 
+            $method = 'DELETE';
             $response[] = $this->_make_aquos_api_request($json_body, $signature, $method);
         }
         error_log('Response from Aquos API after cancellation: ' . print_r($response, true));
@@ -322,7 +301,7 @@ error_log(
             if ($res->Status == true) {
                 $error[] = false;
             } else {
-                $error [] = true;
+                $error[] = true;
                 error_log('Erreur lors de l\'annulation du rendez-vous: ' . print_r($res, true));
                 return new WP_Error('cancellation_error', 'Erreur lors de l\'annulation du rendez-vous: ' . print_r($res, true));
             }
@@ -331,12 +310,9 @@ error_log(
             error_log('Une ou plusieurs annulations ont échoué.');
             return false; // Au moins une annulation a échoué
         } else {
-               error_log('Toutes les annulations ont réussi.');
-               return true; // Toutes les annulations ont réussi
-           }
-
-        
-
+            error_log('Toutes les annulations ont réussi.');
+            return true; // Toutes les annulations ont réussi
+        }
     }
     /** Generate HMAC signature
      *
@@ -358,7 +334,7 @@ error_log(
      */
     private function _make_aquos_api_request($json_body, $signature, $method = 'POST')
     {
-        if ($method ==='POST') {
+        if ($method === 'POST') {
             $url = $this->aquos_daily_appointment_url;
         } elseif ($method === 'DELETE') {
             $url = $this->aquos_cancelation_url;

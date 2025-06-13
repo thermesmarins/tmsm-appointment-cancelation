@@ -102,10 +102,6 @@ class Tmsm_Appointment_Cancelation_Admin
         return $sanitized_input;
     }
 
-    public function section_callback($args)
-    {
-        // Affiche la description de la section
-    }
 
     public function field_callback($args)
     {
@@ -134,7 +130,7 @@ class Tmsm_Appointment_Cancelation_Admin
             return;
         }
 ?>
-        <div class="wrap" >
+        <div class="wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
             <form action="options.php" method="post">
                 <?php
