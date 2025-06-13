@@ -310,6 +310,7 @@ class Tmsm_Appointment_Cancelation_Aquos
             error_log('Une ou plusieurs annulations ont échoué.');
             return false; // Au moins une annulation a échoué
         } else {
+           
             error_log('Toutes les annulations ont réussi.');
             return true; // Toutes les annulations ont réussi
         }

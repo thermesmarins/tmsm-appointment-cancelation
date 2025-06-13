@@ -149,6 +149,14 @@ class Tmsm_Appointment_Cancelation_Public
             $redirect_url_base = home_url('/rdv/');
             // Ajouter le statut de l'annulation
             if ($cancel_status) {
+                 $user_email = "";
+            $appointments_details =array();
+             // ALL appointments successfully cancelled.
+            // 1. Send email to the client using the new class
+            Tmsm_Appointment_Cancelation_Customer_Email::send_cancellation_confirmation($user_email, $appointments_details);
+
+            // 2. Send email to the administrator using the new class
+            Tmsm_Appointment_Cancelation_Admin_Email::send_cancellation_notification($appointments_details, $user_email);
                 $redirect_url = add_query_arg('cancel_status', 'success', $redirect_url_base);
             } else {
                 $redirect_url = add_query_arg('cancel_status', 'error', $redirect_url_base);

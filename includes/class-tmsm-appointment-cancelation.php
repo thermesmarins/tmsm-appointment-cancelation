@@ -122,6 +122,10 @@ class Tmsm_Appointment_Cancelation
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-tmsm-appointment-cancelation-i18n.php';
 
+		// New: Require the email classes
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-tmsm-appointment-cancelation-customer-email.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-tmsm-appointment-cancelation-admin-email.php';
+
 		$this->loader = new Tmsm_Appointment_Cancelation_Loader();
 	}
 
@@ -161,7 +165,6 @@ class Tmsm_Appointment_Cancelation
 		$this->loader->add_filter('the_content', $plugin_public, 'tmsm_handle_user_appointments_content');
 
 		$this->loader->add_filter('query_vars', $plugin_public, 'tmsm_add_query_vars');
-
 	}
 
 	/**
