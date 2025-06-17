@@ -234,7 +234,7 @@ class Tmsm_Appointment_Cancelation_Public
                 $date_to_show = $this->aquos_api_handler->get_formatted_date($this->aquos_api_handler->get_aquos_appointment_date());
                 $client_name = $this->aquos_api_handler->get_customer_name() ?? '';
                 $appointment_ids = [];
-                $output = '<h3>' . esc_html__('Hello ' . $client_name . ' your reservation for ', 'tmsm-appointment-cancelation') . esc_html($date_to_show) . '</h3>';
+                $output = '<h3>' . sprintf(__('Hello %s your reservation for %s', 'tmsm-appointment-cancelation'), $client_name, esc_html($date_to_show)) . '</h3>';
                 if (! empty($appointments) && isset($appointments[0]->id)) {
                     $output .= '<ul>';
                     $any_cancellable_appointment = false; // Flag pour savoir si au moins un RDV est annulable
