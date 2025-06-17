@@ -126,6 +126,8 @@ class Tmsm_Appointment_Cancelation
 		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-tmsm-appointment-cancelation-customer-email.php';
 		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-tmsm-appointment-cancelation-admin-email.php';
 
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/tmsm-helpers.php';
+
 		$this->loader = new Tmsm_Appointment_Cancelation_Loader();
 	}
 

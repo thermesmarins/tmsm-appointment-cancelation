@@ -16,23 +16,23 @@ if (! defined('ABSPATH')) {
 }
 
 // Helper function to format date - (ensure tmsm_format_date_for_email is available, e.g., from customer email template or a shared file)
-if (!function_exists('tmsm_format_date_for_email')) {
-    function tmsm_format_date_for_email($date_str) {
-        // Assuming $date_str is in 'YYYYMMDD' format
-        $date_obj = DateTime::createFromFormat('Ymd', $date_str);
-        if ($date_obj) {
-            if (function_exists('strftime') && strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-                setlocale(LC_TIME, get_locale() . '.utf8', get_locale());
-                return strftime('%A %d %B %Y', $date_obj->getTimestamp());
-            } else {
-                $months = array(1 => 'janvier', 2 => 'février', 3 => 'mars', 4 => 'avril', 5 => 'mai', 6 => 'juin', 7 => 'juillet', 8 => 'août', 9 => 'septembre', 10 => 'octobre', 11 => 'novembre', 12 => 'décembre');
-                $days = array(1 => 'lundi', 2 => 'mardi', 3 => 'mercredi', 4 => 'jeudi', 5 => 'vendredi', 6 => 'samedi', 7 => 'dimanche');
-                return $days[$date_obj->format('N')] . ' ' . $date_obj->format('d') . ' ' . $months[(int)$date_obj->format('n')] . ' ' . $date_obj->format('Y');
-            }
-        }
-        return $date_str;
-    }
-}
+// if (!function_exists('tmsm_format_date_for_email')) {
+//     function tmsm_format_date_for_email($date_str) {
+//         // Assuming $date_str is in 'YYYYMMDD' format
+//         $date_obj = DateTime::createFromFormat('Ymd', $date_str);
+//         if ($date_obj) {
+//             if (function_exists('strftime') && strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+//                 setlocale(LC_TIME, get_locale() . '.utf8', get_locale());
+//                 return strftime('%A %d %B %Y', $date_obj->getTimestamp());
+//             } else {
+//                 $months = array(1 => 'janvier', 2 => 'février', 3 => 'mars', 4 => 'avril', 5 => 'mai', 6 => 'juin', 7 => 'juillet', 8 => 'août', 9 => 'septembre', 10 => 'octobre', 11 => 'novembre', 12 => 'décembre');
+//                 $days = array(1 => 'lundi', 2 => 'mardi', 3 => 'mercredi', 4 => 'jeudi', 5 => 'vendredi', 6 => 'samedi', 7 => 'dimanche');
+//                 return $days[$date_obj->format('N')] . ' ' . $date_obj->format('d') . ' ' . $months[(int)$date_obj->format('n')] . ' ' . $date_obj->format('Y');
+//             }
+//         }
+//         return $date_str;
+//     }
+// }
 ?>
 
 <!DOCTYPE html>

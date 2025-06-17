@@ -39,7 +39,6 @@ class Tmsm_Appointment_Cancelation_Public
      * @var      array|WP_Error|null $user_appointments_cache
      */
     private $user_appointments_cache = null;
-
     /**
      * To know if the appointments have been loaded.
      * This is used to avoid multiple API calls for the same appointments.
@@ -124,18 +123,37 @@ class Tmsm_Appointment_Cancelation_Public
                 wp_redirect(add_query_arg('cancel_status', 'nonce_error', home_url('/rdv/')));
                 exit;
             }
+            $appointments_details_json = isset($_POST['appointments_details']) ? wp_unslash($_POST['appointments_details']) : '';
 
+            $cancelled_appointments_details = [];
 
+            if (!empty($appointments_details_json)) {
+                $decoded_details = json_decode($appointments_details_json);
+
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded_details)) {
+                    $cancelled_appointments_details = $decoded_details;
+                    error_log('Détails des rendez-vous décodés avec succès : ' . print_r($cancelled_appointments_details, true));
+                } else {
+                    error_log('Erreur lors du décodage des détails des rendez-vous JSON: ' . json_last_error_msg() . ' JSON String: ' . $appointments_details_json);
+                    // En cas d'erreur de décodage, vous pouvez choisir de rediriger
+                    // ou de simplement ne pas avoir les détails dans l'email, selon la criticité.
+                    wp_redirect(add_query_arg('cancel_status', 'json_error', home_url('/rdv/')));
+                    exit;
+                }
+            } else {
+                error_log('Aucun détail de rendez-vous JSON n\'a été fourni dans la requête POST. Cela peut indiquer une soumission incorrecte du formulaire.');
+                // Si les détails sont obligatoires pour l'e-mail, vous pouvez rediriger ici aussi.
+                wp_redirect(add_query_arg('cancel_status', 'missing_details', home_url('/rdv/')));
+                exit;
+            }
             $appointment_ids_string = isset($_POST['appointment_ids']) ? sanitize_text_field($_POST['appointment_ids']) : '';
             $appointment_ids = array_map('intval', explode(',', $appointment_ids_string));
             $fonctionnal_id = isset($_POST['fonctionnal_id']) ? sanitize_text_field($_POST['fonctionnal_id']) : '';
             // Voir si j'ai besoin de récupérer la date car je check en amont la date de validité de l'annualation.
-            $date = isset($_POST['date']) ? sanitize_text_field($_POST['date']) : '';
-            $options = get_option('tmsm_appointment_cancelation_options');
-            $plugin_api_token = isset($options['aquos_appointment_cancellation_token']) ? esc_attr($options['aquos_appointment_cancellation_token']) : '';
-            $aquos_cancel_appointments = new Tmsm_Appointment_Cancelation_Aquos($fonctionnal_id, $plugin_api_token);
+            // $date = isset($_POST['date']) ? sanitize_text_field($_POST['date']) : '';
+            // $options = get_option('tmsm_appointment_cancelation_options');
+            $aquos_cancel_appointments = new Tmsm_Appointment_Cancelation_Aquos($fonctionnal_id);
             $site_id = isset($_POST['site_id']) ? sanitize_text_field($_POST['site_id']) : '';
-
             $cancel_status = false;
             // $cancel_status = $aquos_cancel_appointments->cancel_appointment($appointment_ids);
             // Récupérer l'email du champ du formulaire (toujours depuis $_POST)
@@ -147,16 +165,17 @@ class Tmsm_Appointment_Cancelation_Public
             // Rediriger l'utilisateur après l'action pour éviter les soumissions multiples
             // $redirect_url = remove_query_arg(array('action', 'appointment_id', 'nonce', 'f', 't', 'd', 'site_id'));
             $redirect_url_base = home_url('/rdv/');
+            $cancel_status = true; // Simuler le succès de l'annulation pour les tests
             // Ajouter le statut de l'annulation
             if ($cancel_status) {
-                 $user_email = "";
-            $appointments_details =array();
-             // ALL appointments successfully cancelled.
-            // 1. Send email to the client using the new class
-            Tmsm_Appointment_Cancelation_Customer_Email::send_cancellation_confirmation($user_email, $appointments_details);
+                
+                $appointments_details = $cancelled_appointments_details;
+                // ALL appointments successfully cancelled.
+                // 1. Send email to the client using the new class
+                Tmsm_Appointment_Cancelation_Customer_Email::send_cancellation_confirmation($user_email, $appointments_details, $site_id);
 
-            // 2. Send email to the administrator using the new class
-            Tmsm_Appointment_Cancelation_Admin_Email::send_cancellation_notification($appointments_details, $user_email);
+                // 2. Send email to the administrator using the new class
+                // Tmsm_Appointment_Cancelation_Admin_Email::send_cancellation_notification($appointments_details, $user_email, $site_id);
                 $redirect_url = add_query_arg('cancel_status', 'success', $redirect_url_base);
             } else {
                 $redirect_url = add_query_arg('cancel_status', 'error', $redirect_url_base);
@@ -176,7 +195,7 @@ class Tmsm_Appointment_Cancelation_Public
      */
     public function tmsm_handle_user_appointments_content($content)
     {
-        // https://aquatonic.local/vos-rendez-vous/?f=304555AQREN&t=btwHqtVtGZ&d=2025.05.25
+        // https://aquatonic.local/rdv/?f=304555AQREN&t=btwHqtVtGZ&d=2025.05.25
         global $wp_query;
         $output = '';
         if (isset($_GET['cancel_status'])) {
@@ -260,6 +279,7 @@ class Tmsm_Appointment_Cancelation_Public
                         $output .= '<input type="hidden" name="aquos_appointment_signature" value="' . esc_attr($aquos_appointment_signature) . '">';
                         $output .= '<input type="hidden" name="date" value="' . esc_attr($this->aquos_api_handler->get_aquos_appointment_date()) . '">';
                         $output .= '<input type="hidden" name="customer_name" value="' . esc_attr($this->aquos_api_handler->get_customer_name()) . '">';
+                        $output .= '<input type="hidden" name="appointments_details" value="' . esc_attr(json_encode($appointments)) . '">';
 
                         // CHANGEMENT 2: Ajouter le champ nonce pour la sécurité POST
                         // Au lieu de créer un nonce dans le GET et de le passer en hidden,

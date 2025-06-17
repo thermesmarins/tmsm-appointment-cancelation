@@ -20,7 +20,7 @@ class Tmsm_Appointment_Cancelation_Aquos
     private $aquos_appointment_date;
     private $customer_name;
 
-    public function __construct($fonctionnal_id, $aquos_appointment_signature, $appointment_date = null)
+    public function __construct($fonctionnal_id, $aquos_appointment_signature = null, $appointment_date = null)
     {
         $this->aquos_appointment_date = $appointment_date;
         $this->aquos_fonctionnal_id = $fonctionnal_id;
