@@ -24,24 +24,32 @@ function tmsm_get_site_informations(int $site_id): array {
                 'id' => 0,
                 'name' => 'Aquatonic Rennes',
                 'url' => 'https://aquatonic.fr/rennes',
+                'shop_email' => 'rennes@aquatonic.fr',
+                'resaspa_url' => 'https://aquatonic.fr/rennes/prendre-rdv',
             ),
             array(
                 'email' => 'paris@aquatonic.fr',
                 'id' => 2,
                 'name' => 'Aquatonic Paris',
                 'url' => 'https://aquatonic.fr/paris',
+                'shop_email' => 'paris@aquatonic.fr',
+                'resaspa_url' => 'https://aquatonic.fr/paris/prendre-rdv',
             ),
             array(
                 'email' => 'nantes@aquatonic.fr',
                 'id' => 5,
                 'name' => 'Aquatonic Nantes',
                 'url' => 'https://aquatonic.fr/nantes',
+                'shop_email' => 'nantes@aquatonic.fr',
+                'resaspa_url' => 'https://aquatonic.fr/nantes/prendre-rdv',
             ),
             array(
                 'email' => 'rennes@aquatonic.local',
                 'id' => 10,
                 'name' => 'Aquatonic Rennes Local',
                 'url' => 'https://aquatonic.local/rennes',
+                'shop_email' => 'aflament.dev@gmail.com', // Local development email
+                'resaspa_url' => 'https://aquatonic.local/rennes/prendre-rdv',
             )
         );
 
@@ -53,6 +61,8 @@ function tmsm_get_site_informations(int $site_id): array {
                     'name' => $site_email['name'],
                     'id' => $site_email['id'],
                     'url' => $site_email['url'],
+                    'shop_email' => $site_email['shop_email'],
+                    'resaspa_url' => $site_email['resaspa_url'],
                 );
                 break;
             }
