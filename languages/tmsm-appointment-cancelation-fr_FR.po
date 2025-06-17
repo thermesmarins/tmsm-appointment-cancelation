@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Blank WordPress Pot v1.0.0\n"
 "Report-Msgid-Bugs-To: Translator Name <translations@example.com>\n"
-"POT-Creation-Date: 2025-06-17 15:15+0200\n"
+"POT-Creation-Date: 2025-06-17 16:47+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: Your Team <translations@example.com>\n"
@@ -91,9 +91,8 @@ msgstr "Objet de l'e-mail de confirmation de l'annulation du client."
 
 #: admin/class-tmsm-appointment-cancelation-admin.php:153
 #: includes/class-tmsm-appointment-cancelation-customer-email.php:37
-#, fuzzy
 msgid "Your Appointment Cancellation Confirmation"
-msgstr "Votre rendez-vous est annulé."
+msgstr "Confirmation de l'annulation de votre rendez-vous"
 
 #: admin/class-tmsm-appointment-cancelation-admin.php:160
 msgid "Admin Email Notification"
@@ -106,7 +105,7 @@ msgstr "Activer l'e-mail de l'administrateur"
 #: admin/class-tmsm-appointment-cancelation-admin.php:173
 msgid "Send a notification email to the administrator after cancellation."
 msgstr ""
-"Envoyer un courriel de notification à l'administrateur après l'annulation"
+"Envoyer un courriel de notification à l'administrateur après l'annulation."
 
 #: admin/class-tmsm-appointment-cancelation-admin.php:180
 msgid "Admin Recipient Email(s)"
@@ -270,7 +269,7 @@ msgstr ""
 
 #: public/class-tmsm-appointment-cancelation-public.php:197
 msgid "Your appointment has been successfully canceled!"
-msgstr "Votre rendez-vous est annulé."
+msgstr "Votre rendez-vous est annulé!"
 
 #: public/class-tmsm-appointment-cancelation-public.php:201
 msgid "An error occurred when cancelling your appointment. Please contact us."
@@ -280,7 +279,7 @@ msgstr ""
 #: public/class-tmsm-appointment-cancelation-public.php:237
 #, php-format
 msgid "Hello %s your reservation for %s"
-msgstr ""
+msgstr "Bonjour %s votre réservation pour le %s"
 
 #: public/class-tmsm-appointment-cancelation-public.php:256
 msgid "Cancellation deadline passed"
@@ -357,7 +356,7 @@ msgstr "Heure :"
 
 #: templates/email-admin-cancellation-notification.php:64
 msgid "Appointment ID:"
-msgstr "ID du rendez-vous"
+msgstr "ID du rendez-vous :"
 
 #: templates/email-admin-cancellation-notification.php:66
 msgid "Location:"
@@ -374,7 +373,7 @@ msgstr ""
 #: templates/email-admin-cancellation-notification.php:79
 #: templates/email-cancellation-confirmation.php:79
 msgid "Sincerely,"
-msgstr "A très bientôt"
+msgstr "A très bientôt,"
 
 #: templates/email-admin-cancellation-notification.php:85
 msgid "This is an automated notification from your WordPress website."
