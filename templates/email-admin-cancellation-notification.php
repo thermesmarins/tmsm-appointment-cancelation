@@ -39,50 +39,50 @@ if (! defined('ABSPATH')) {
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title><?php echo esc_html($site_name); ?> - <?php echo esc_html__('Appointment Cancellation Notification', 'tmsm-appointment-cancelation'); ?></title>
+    <title><?php echo esc_html($site_name); ?> - <?php echo esc_html__('Notification d\'annulation de rendez-vous', 'tmsm-appointment-cancelation'); ?></title>
 </head>
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px;">
     <div style="max-width: 600px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-        <h2 style="color: #d9534f; text-align: center;"><?php echo esc_html__('Appointment Cancellation Notification', 'tmsm-appointment-cancelation'); ?></h2>
-        
-        <p><?php echo esc_html__('Dear Administrator,', 'tmsm-appointment-cancelation'); ?></p>
-        
-        <p><?php echo esc_html__('The following appointment(s) have been cancelled on your website', 'tmsm-appointment-cancelation'); ?> **<?php echo esc_html($site_name); ?>**:</p>
-        
+        <h2 style="color:rgb(0, 115, 170); text-align: center;"><?php echo esc_html__('Notification d\'annulation de rendez-vous', 'tmsm-appointment-cancelation'); ?></h2>
+
+        <p><?php echo esc_html__('Cher Aquatonic,', 'tmsm-appointment-cancelation'); ?></p>
+
+        <p><?php echo esc_html__('Les rendez-vous suivants ont été annulés sur votre site', 'tmsm-appointment-cancelation'); ?> <?php echo esc_html($site_name); ?> :</p>
+
         <ul style="list-style-type: none; padding: 0;">
             <?php foreach ($appointments as $appointment) : ?>
                 <?php
                 $formatted_date = tmsm_format_date_for_email($appointment->appointment_date);
-                $formatted_time = isset($appointment->appointment_time) ? substr($appointment->appointment_time, 0, 2) . ':' . substr($appointment->appointment_time, 2, 2) : '';
+                $formatted_time = isset($appointment->appointment_hour) ? substr($appointment->appointment_hour, 0, 2) . ':' . substr($appointment->appointment_hour, 2, 2) : '';
                 ?>
                 <li style="margin-bottom: 10px; padding: 10px; background-color: #f9f9f9; border-left: 3px solid #eee;">
                     <strong><?php echo esc_html($appointment->appointment); ?></strong><br>
-                    <?php echo esc_html__('Date:', 'tmsm-appointment-cancelation'); ?> **<?php echo esc_html($formatted_date); ?>**
+                    <?php echo esc_html__('Date :', 'tmsm-appointment-cancelation'); ?> <?php echo esc_html($formatted_date); ?>
                     <?php if (!empty($formatted_time)) : ?>
-                        <br><?php echo esc_html__('Time:', 'tmsm-appointment-cancelation'); ?> **<?php echo esc_html($formatted_time); ?>**
+                        <br><?php echo esc_html__('Heure :', 'tmsm-appointment-cancelation'); ?> **<?php echo esc_html($formatted_time); ?>
                     <?php endif; ?>
-                    <br><?php echo esc_html__('Appointment ID:', 'tmsm-appointment-cancelation'); ?> **<?php echo esc_html($appointment->id); ?>**
+                    <br><?php echo esc_html__('ID de rendez-vous :', 'tmsm-appointment-cancelation'); ?> **<?php echo esc_html($appointment->id); ?>
                     <?php if (isset($appointment->location) && !empty($appointment->location)) : ?>
-                        <br><?php echo esc_html__('Location:', 'tmsm-appointment-cancelation'); ?> **<?php echo esc_html($appointment->location); ?>**
+                        <br><?php echo esc_html__('Emplacement :', 'tmsm-appointment-cancelation'); ?> **<?php echo esc_html($appointment->location); ?>
                     <?php endif; ?>
                 </li>
             <?php endforeach; ?>
         </ul>
 
         <?php if (!empty($client_email)) : ?>
-            <p><?php echo esc_html__('Client Email:', 'tmsm-appointment-cancelation'); ?> <a href="mailto:<?php echo esc_attr($client_email); ?>" style="color: #0073aa; text-decoration: none;">**<?php echo esc_html($client_email); ?>**</a></p>
+            <p><?php echo esc_html__('Email du client :', 'tmsm-appointment-cancelation'); ?> <a href="mailto:<?php echo esc_attr($client_email); ?>" style="color:rgb(0, 115, 170); text-decoration: none;">**<?php echo esc_html($client_email); ?></a></p>
         <?php endif; ?>
-        
-        <p><?php echo esc_html__('Please check your appointment system for more details regarding this cancellation.', 'tmsm-appointment-cancelation'); ?></p>
-        
+
+        <p><?php echo esc_html__('Veuillez vérifier votre système de rendez-vous pour plus de détails concernant cette annulation.', 'tmsm-appointment-cancelation'); ?></p>
+
         <p style="text-align: center; margin-top: 30px;">
-            <?php echo esc_html__('Sincerely,', 'tmsm-appointment-cancelation'); ?><br>
+            <?php echo esc_html__('Cordialement,', 'tmsm-appointment-cancelation'); ?><br>
             <strong><?php echo esc_html($site_name); ?></strong><br>
             <a href="<?php echo esc_url($site_url); ?>" style="color: #0073aa; text-decoration: none;"><?php echo esc_url($site_url); ?></a>
         </p>
         
         <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #888;">
-            <?php echo esc_html__('This is an automated notification from your WordPress website.', 'tmsm-appointment-cancelation'); ?>
+            <?php echo esc_html__('Ceci est une notification automatique de votre site WordPress.', 'tmsm-appointment-cancelation'); ?>
         </div>
     </div>
 </body>

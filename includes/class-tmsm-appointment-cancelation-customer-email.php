@@ -34,8 +34,8 @@ class Tmsm_Appointment_Cancelation_Customer_Email
         $site_informations = tmsm_get_site_informations($site_id);
 
 
-        $subject = isset($options['email_subject_client_confirmation']) ? $options['email_subject_client_confirmation'] : __('Your Appointment Cancellation Confirmation', 'tmsm-appointment-cancelation');
-  
+        $subject = isset($options['email_subject_client_confirmation']) ? $options['email_subject_client_confirmation'] : __('Confirmation de l\'annulation de votre rendez-vous', 'tmsm-appointment-cancelation');
+
         $from_name = $site_informations['name'];
         $from_email = $site_informations['email'];
 
@@ -47,7 +47,7 @@ class Tmsm_Appointment_Cancelation_Customer_Email
 
 
         $message_body = self::get_email_content($appointment_details, $site_informations);
-       
+        error_log('message_body: ' . $message_body);
         // Todo : uncomment the next line to actually send the email
         $sent = wp_mail($to, $subject, $message_body, $headers);
 
@@ -76,6 +76,7 @@ class Tmsm_Appointment_Cancelation_Customer_Email
             'resaspa_url' => $site_informations['resaspa_url'],
             'shop_email'   => $site_informations['shop_email'],
             'options'      => get_option('tmsm_appointment_cancelation_options'),
+            'logo_url'     => $site_informations['logo_url'],
         );
 
         $template_path = plugin_dir_path(dirname(__FILE__)) . 'templates/email-cancellation-confirmation.php';
@@ -101,5 +102,4 @@ class Tmsm_Appointment_Cancelation_Customer_Email
         }
         return ob_get_clean();
     }
-   
 }

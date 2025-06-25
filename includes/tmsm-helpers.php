@@ -26,6 +26,7 @@ function tmsm_get_site_informations(int $site_id): array {
                 'url' => 'https://aquatonic.fr/rennes',
                 'shop_email' => 'rennes@aquatonic.fr',
                 'resaspa_url' => 'https://aquatonic.fr/rennes/prendre-rdv',
+                'logo_url' => 'https://aquatonic.fr/rennes/wp-content/uploads/sites/6/2017/05/Aquatonic-rennes-logo.png',
             ),
             array(
                 'email' => 'paris@aquatonic.fr',
@@ -34,6 +35,7 @@ function tmsm_get_site_informations(int $site_id): array {
                 'url' => 'https://aquatonic.fr/paris',
                 'shop_email' => 'paris@aquatonic.fr',
                 'resaspa_url' => 'https://aquatonic.fr/paris/prendre-rdv',
+                'logo_url' => 'https://aquatonic.fr/paris/wp-content/uploads/sites/9/2017/11/logo_aquatonic-paris-600-300.png',
             ),
             array(
                 'email' => 'nantes@aquatonic.fr',
@@ -42,6 +44,7 @@ function tmsm_get_site_informations(int $site_id): array {
                 'url' => 'https://aquatonic.fr/nantes',
                 'shop_email' => 'nantes@aquatonic.fr',
                 'resaspa_url' => 'https://aquatonic.fr/nantes/prendre-rdv',
+                'logo_url' => 'https://aquatonic.fr/nantes/wp-content/uploads/sites/8/2017/11/logo_aquatonic-nantes-600-300.png',
             ),
             array(
                 'email' => 'rennes@aquatonic.local',
@@ -50,6 +53,7 @@ function tmsm_get_site_informations(int $site_id): array {
                 'url' => 'https://aquatonic.local/rennes',
                 'shop_email' => 'aflament.dev@gmail.com', // Local development email
                 'resaspa_url' => 'https://aquatonic.local/rennes/prendre-rdv',
+                'logo_url' => 'https://aquatonic.fr/rennes/wp-content/uploads/sites/6/2017/05/Aquatonic-rennes-logo.png',
             )
         );
 
@@ -63,6 +67,7 @@ function tmsm_get_site_informations(int $site_id): array {
                     'url' => $site_email['url'],
                     'shop_email' => $site_email['shop_email'],
                     'resaspa_url' => $site_email['resaspa_url'],
+                    'logo_url' => $site_email['logo_url']
                 );
                 break;
             }
@@ -88,20 +93,20 @@ if (!function_exists('tmsm_format_date_for_email')) {
         }
 
         // Try to use IntlDateFormatter for robust localization (requires intl extension)
-        if (class_exists('IntlDateFormatter')) {
-            // Get WordPress locale
-            $locale = get_locale(); // e.g., 'fr_FR'
+        // if (class_exists('IntlDateFormatter')) {
+        //     // Get WordPress locale
+        //     $locale = get_locale(); // e.g., 'fr_FR'
 
-            // Create a formatter for full date
-            $formatter = new IntlDateFormatter(
-                $locale,
-                IntlDateFormatter::FULL, // Full format (e.g., "lundi 1 janvier 2024")
-                IntlDateFormatter::NONE, // No time
-                null, // Default timezone
-                IntlDateFormatter::GREGORIAN
-            );
-            return $formatter->format($date_obj);
-            } else {
+        //     // Create a formatter for full date
+        //     $formatter = new IntlDateFormatter(
+        //         $locale,
+        //         IntlDateFormatter::FULL, // Full format (e.g., "lundi 1 janvier 2024")
+        //         IntlDateFormatter::NONE, // No time
+        //         null, // Default timezone
+        //         IntlDateFormatter::GREGORIAN
+        //     );
+        //     return $formatter->format($date_obj);
+        //     } else {
                 // Fallback for newer PHP versions (strftime deprecated) or Windows
                 $months = array(
                     1 => __('janvier', 'tmsm-appointment-cancelation'),
@@ -127,7 +132,7 @@ if (!function_exists('tmsm_format_date_for_email')) {
                     7 => __('dimanche', 'tmsm-appointment-cancelation')
                 );
                 return $days[$date_obj->format('N')] . ' ' . $date_obj->format('d') . ' ' . $months[(int)$date_obj->format('n')] . ' ' . $date_obj->format('Y');
-            }
+        //     }
         }
         return $date_str; // Return original if format is unexpected
     }

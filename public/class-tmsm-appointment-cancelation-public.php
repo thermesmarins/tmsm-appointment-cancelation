@@ -166,7 +166,7 @@ class Tmsm_Appointment_Cancelation_Public
                 // 1. Send email to the client using the new class
                 Tmsm_Appointment_Cancelation_Customer_Email::send_cancellation_confirmation($user_email, $appointments_details, $site_id);
                 // 2. Send email to the administrator using the new class
-                // Tmsm_Appointment_Cancelation_Admin_Email::send_cancellation_notification($appointments_details, $user_email, $site_id);
+                Tmsm_Appointment_Cancelation_Admin_Email::send_cancellation_notification($appointments_details, $user_email, $site_id);
                 $redirect_url = add_query_arg('cancel_status', 'success', $redirect_url_base);
             } else {
                 $redirect_url = add_query_arg('cancel_status', 'error', $redirect_url_base);
@@ -186,7 +186,7 @@ class Tmsm_Appointment_Cancelation_Public
      */
     public function tmsm_handle_user_appointments_content($content)
     {
-        // https://aquatonic.local/rdv/?f=304555AQREN&t=btwHqtVtGZ&d=2025.05.25
+        // https://aquatonic.local/rdv/?f=305402AQREN&t=65oPTMLgoZ&d=2025.06.23
         global $wp_query;
         $output = '';
         if (isset($_GET['cancel_status'])) {
@@ -282,7 +282,7 @@ class Tmsm_Appointment_Cancelation_Public
                         $output .= '<button type="submit" class="elementor-button elementor-size-sm " style="margin-top: 10px;">' . __('Cancel this appointment', 'tmsm-appointment-cancelation') . '</button>';
                         $output .= '</ul>';
                     } else {
-                        // Todod : Ajout d'un lien vers les CGV
+                        // Todo : voir pour un lien avec Tel ? ou fiche contact ?
                         $home_url = tmsm_get_site_informations($site_id)['url'];
                         $terms_conditions_url = $home_url . '/conditions-generales-de-vente/';
 

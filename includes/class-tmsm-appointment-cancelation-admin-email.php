@@ -20,16 +20,16 @@ class Tmsm_Appointment_Cancelation_Admin_Email {
             error_log('Admin cancellation notification email disabled.');
             return false;
         }
-// Todo : voir comment gérer les emails pour les différents sites
+
         $site_informations = tmsm_get_site_informations($site_id);
-        $to = isset($site_informations['admin_email']) ? sanitize_email($site_informations['admin_email']) : get_bloginfo('admin_email');
+        $to = isset($site_informations['shop_email']) ? sanitize_email($site_informations['shop_email']) : get_bloginfo('admin_email');
         if (empty($to) || !is_email($to)) {
             error_log('Invalid or missing admin email address for notification.');
             return false;
         }
         error_log('De qui : ' . $to);
 
-        $subject = isset($options['email_subject_admin_notification']) ? $options['email_subject_admin_notification'] : __('Appointment Cancellation Notification', 'tmsm-appointment-cancelation');
+        $subject = isset($options['email_subject_admin_notification']) ? $options['email_subject_admin_notification'] : __('Notification d\'annulation de rendez-vous', 'tmsm-appointment-cancelation');
         $from_name = isset($options['email_from_name']) ? $options['email_from_name'] : get_bloginfo('name');
         $from_email = isset($options['email_from_email']) ? $options['email_from_email'] : get_bloginfo('admin_email');
 
