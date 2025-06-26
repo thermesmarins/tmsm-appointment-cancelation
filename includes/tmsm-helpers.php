@@ -136,4 +136,31 @@ if (!function_exists('tmsm_format_date_for_email')) {
         }
         return $date_str; // Return original if format is unexpected
     }
+    /**
+     * Set formatted identity for the customer.
+     *
+     * @param string $customer_civility
+     * @param string $customer_lastname
+     * @param string $customer_firstname
+     * @return string
+     */
+    function tmsm_set_formatted_identity($customer_civility, $customer_lastname, $customer_firstname)
+    {
+
+        // Formater l'identité du client
+        $formatted_identity = '';
+        if (!empty($customer_civility)) {
+            $formatted_identity .= $customer_civility . ' ';
+            if (!empty($customer_lastname)) {
+                $formatted_identity .= $customer_lastname . ' ';
+            }
+        } else if (!empty($customer_firstname)) {
+                $formatted_identity .= $customer_firstname;
+            // Si la civilité est vide, on n'ajoute pas d'espace
+            if (!empty($customer_lastname)) {
+                $formatted_identity .= $customer_lastname . ' ';
+            }
+        }
+        return trim($formatted_identity); // Retirer les espaces superflus
+    }
 }

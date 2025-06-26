@@ -194,11 +194,11 @@ class Tmsm_Appointment_Cancelation_Public
 
             if ('success' === $cancel_status) {
                 $output .= '<div class="tmsm-notification tmsm-notification-success">';
-                $output .= '<p>' . __('Your appointment has been successfully canceled!', 'tmsm-appointment-cancelation') . '</p>';
+                $output .= '<span>' . __('Your appointment has been successfully canceled!', 'tmsm-appointment-cancelation') . '</span>';
                 $output .= '</div>';
             } elseif ('error' === $cancel_status) {
                 $output .= '<div class="tmsm-notification tmsm-notification-error">';
-                $output .= '<p>' . __('An error occurred when cancelling your appointment. Please contact us.', 'tmsm-appointment-cancelation') . '</p>';
+                $output .= '<span>' . __('An error occurred when cancelling your appointment. Please contact us.', 'tmsm-appointment-cancelation') . '</span>';
                 $output .= '</div>';
             }
             return $output;
@@ -232,11 +232,10 @@ class Tmsm_Appointment_Cancelation_Public
                 // Utiliser les rendez-vous en cache
                 $appointments = $this->user_appointments_cache;
                 $date_to_show = $this->aquos_api_handler->get_formatted_date($this->aquos_api_handler->get_aquos_appointment_date());
-                $client_name = $this->aquos_api_handler->get_customer_name() ?? '';
+                $client_name = $this->aquos_api_handler->get_customer_identity() ?? '';
                 $appointment_ids = [];
-                $output = '<h3>' . sprintf(__('Hello %s your reservation for %s', 'tmsm-appointment-cancelation'), $client_name, esc_html($date_to_show)) . '</h3>';
+                $output = '<p>' . sprintf(__('Hello %s <br/> your reservation for %s', 'tmsm-appointment-cancelation'), $client_name, esc_html($date_to_show)) . '</p>';
                 if (! empty($appointments) && isset($appointments[0]->id)) {
-                    $output .= '<ul>';
                     $any_cancellable_appointment = false; // Flag pour savoir si au moins un RDV est annulable
                     $current_user_email = $appointments[0]->email ?? ''; // Récupère l'email du premier RDV pour vérification
                     $options = get_option('tmsm_appointment_cancelation_options');
@@ -253,7 +252,7 @@ class Tmsm_Appointment_Cancelation_Public
                             $any_cancellable_appointment = true; // Un rendez-vous est annulable
                         } else {
                             // Afficher un petit message à côté du RDV s'il n'est pas annulable individuellement
-                            $output .= ' <span style="color: #999; font-size: 0.9em;">(' . esc_html__('Cancellation deadline passed', 'tmsm-appointment-cancelation') . ')</span>';
+                            $output .= ' <span style="color: #999; font-size: 0.9em;">(' . esc_html__('Cancellation deadline passed', 'tmsm-appointment-cancelation') . ')</span><br/>';
                         }
                     }
                     if ($any_cancellable_appointment) {
@@ -266,7 +265,7 @@ class Tmsm_Appointment_Cancelation_Public
                         $output .= '<input type="hidden" name="fonctionnal_id" value="' . esc_attr($fonctionnal_id) . '">';
                         $output .= '<input type="hidden" name="aquos_appointment_signature" value="' . esc_attr($aquos_appointment_signature) . '">';
                         $output .= '<input type="hidden" name="date" value="' . esc_attr($this->aquos_api_handler->get_aquos_appointment_date()) . '">';
-                        $output .= '<input type="hidden" name="customer_name" value="' . esc_attr($this->aquos_api_handler->get_customer_name()) . '">';
+                        $output .= '<input type="hidden" name="customer_name" value="' . esc_attr($this->aquos_api_handler->get_customer_identity()) . '">';
                         $output .= '<input type="hidden" name="appointments_details" value="' . esc_attr(json_encode($appointments)) . '">';
 
                         $output .= wp_nonce_field('annuler_rendez_vous_action', 'tmsm_cancel_nonce', true, false); // Nom de l'action pour le nonce, Nom du champ hidden, true pour echo, false pour ne pas être un champ d'admin par défaut
@@ -277,10 +276,10 @@ class Tmsm_Appointment_Cancelation_Public
                         $output .= '</p>';
 
                         if (count($appointment_ids) > 1) {
-                            $output .= '<p class="tmsm-notification-warning">' . __('Clicking on the button below will cancel all appointments for the day. If you have any questions, please contact us', 'tmsm-appointment-cancelation') . '</p>';
+                            // todo : ajout du lien d'email pour contacter l'établissement
+                            $output .= '<p class="tmsm-notification tmsm-notification-warning">' . __('Clicking on the button below will cancel all appointments for the day. If you have any questions, please contact us', 'tmsm-appointment-cancelation') . '</p><br/>';
                         }
-                        $output .= '<button type="submit" class="elementor-button elementor-size-sm " style="margin-top: 10px;">' . __('Cancel this appointment', 'tmsm-appointment-cancelation') . '</button>';
-                        $output .= '</ul>';
+                        $output .= '<button type="submit" class="cancelation-button">' . __('Cancel this appointment', 'tmsm-appointment-cancelation') . '</button>';
                     } else {
                         // Todo : voir pour un lien avec Tel ? ou fiche contact ?
                         $home_url = tmsm_get_site_informations($site_id)['url'];

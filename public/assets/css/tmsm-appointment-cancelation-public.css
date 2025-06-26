@@ -1,7 +1,7 @@
 .tmsm-notification{
-    padding: 15px;
+    padding: 10px;
     margin: 20px 0;
-    text-align: center;
+    /* text-align: center; */
     border-radius: 4px;
     position: relative;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -10,7 +10,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 90%; /* ou une largeur fixe */
+    max-width: 100%; /* ou une largeur fixe */
     margin-left: auto;
     margin-right: auto;
 }
@@ -25,7 +25,7 @@
     border-color: #ebccd1;
 }
 .tmsm-notification-warning {
-    background-color: #f2dede; /* Rouge pâle pour erreur */
+    background-color: #f0c195; /* Rouge pâle pour erreur */
     color: #6b341e;
     border-color: #ebccd1;
 }
@@ -42,4 +42,12 @@
 
 .tmsm-close-notification:hover {
     opacity: .5;
+}
+button.cancelation-button {
+    background-color: #030303; /* Couleur de fond du bouton */
+    color: white; /* Couleur du texte du bouton */
+    border: none; /* Pas de bordure */
+    padding: 20px 15px; /* Espacement interne */
+    font-size: 16px; /* Taille de police */
+    margin-top: 10px;
 }

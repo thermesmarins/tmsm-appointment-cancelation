@@ -18,7 +18,7 @@ class Tmsm_Appointment_Cancelation_Aquos
     private $aquos_site_id;
     private $aquos_sites;
     private $aquos_appointment_date;
-    private $customer_name;
+    private $customer_identity;
 
     public function __construct($fonctionnal_id, $aquos_appointment_signature = null, $appointment_date = null)
     {
@@ -115,9 +115,9 @@ class Tmsm_Appointment_Cancelation_Aquos
     {
         return $this->aquos_security_token;
     }
-    public function get_customer_name()
+    public function get_customer_identity()
     {
-        return $this->customer_name;
+        return $this->customer_identity;
     }
     /**
      * Méthode publique pour récupérer l'URL d'annulation Aquos.
@@ -172,12 +172,16 @@ class Tmsm_Appointment_Cancelation_Aquos
         if (empty($appointments) || isset($appointments->ErrorMessage)) {
             return []; // Si pas de rendez-vous ou erreur, retourner un tableau vide
         } else {
-           
-            $this->customer_name = $appointments->appointments[0]->customer; // Récupérer le nom du client
-            error_log('Customer name from Aquos: ' . $this->customer_name);
+            $this->customer_identity =  tmsm_set_formatted_identity(
+                $appointments->appointments[0]->customer_civility ?? '',
+                $appointments->appointments[0]->customer_lastname ?? '',
+                $appointments->appointments[0]->customer_firstname ?? ''
+            );
+            error_log('Customer identity from Aquos: ' . $this->customer_identity);
             return $appointments->appointments;
         }
     }
+   
     /**
      * Methode privée pour récupérer la signature du rendez-vous pour l'appel vers Aquos
      *
@@ -186,7 +190,7 @@ class Tmsm_Appointment_Cancelation_Aquos
     private function get_daily_appointments()
     {
         $site_id =  $this->aquos_site_id; // mettre 10 pour les tests
-        $appointment_id =  $this->aquos_appointment_id; 
+        $appointment_id =  $this->aquos_appointment_id;
         $date =  $this->get_aquos_appointment_date();
         $appointment_signature = $this->aquos_appointment_signature;
         $appointment_array = array(
@@ -310,7 +314,7 @@ class Tmsm_Appointment_Cancelation_Aquos
             error_log('Une ou plusieurs annulations ont échoué.');
             return false; // Au moins une annulation a échoué
         } else {
-           
+
             error_log('Toutes les annulations ont réussi.');
             return true; // Toutes les annulations ont réussi
         }

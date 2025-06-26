@@ -27,15 +27,19 @@ if (! defined('ABSPATH')) {
 </head>
 
 
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px;">
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color:black; margin: 0; padding: 20px;">
     <div style="max-width: 600px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
         <div style="text-align: center; margin-bottom: 20px;">
             <img src="<?php echo esc_url($logo_url); ?>" alt="<?php echo esc_attr($site_name); ?> Logo" style="max-width: 300px; height: auto; display: inline-block;">
         </div>
-        <h2 style="color: #0073aa; text-align: center;"><?php echo esc_html__('Votre annulation de rendez-vous a été confirmée', 'tmsm-appointment-cancelation'); ?></h2>
-        <p><?php echo esc_html__('Bonjour ' . $appointments[0]->customer . ',', 'tmsm-appointment-cancelation'); ?></p>
+        <h2 style="color: #0073aa; text-align: center;"><?php echo esc_html__('Annulation de votre rendez-vous.', 'tmsm-appointment-cancelation'); ?></h2>
+        <p><?php echo esc_html__('Bonjour ' . tmsm_set_formatted_identity(
+                $appointments[0]->customer_civility ?? '',
+                $appointments[0]->customer_lastname ?? '',
+                $appointments[0]->customer_firstname ?? ''
+            ) . ',', 'tmsm-appointment-cancelation'); ?></p>
 
-        <p><?php echo esc_html__('Cet e-mail confirme que votre/vos rendez-vous ont été annulés avec succès chez', 'tmsm-appointment-cancelation'); ?> <?php echo esc_html($site_name); ?>:</p>
+        <p><?php echo esc_html__('Suite à votre demande, nous vous confirmons que votre rendez-vous à l\'', 'tmsm-appointment-cancelation'); ?><?php echo esc_html($site_name); ?><?php echo esc_html__(' est annulé.', 'tmsm-appointment-cancelation'); ?></p>
 
         <ul style="list-style-type: none; padding: 0;">
             <?php foreach ($appointments as $appointment) : ?>
@@ -43,7 +47,7 @@ if (! defined('ABSPATH')) {
                 $formatted_date = tmsm_format_date_for_email($appointment->appointment_date);
                 $formatted_time = isset($appointment->appointment_hour) ? substr($appointment->appointment_hour, 0, 2) . ':' . substr($appointment->appointment_hour, 2, 2) : '';
                 ?>
-                <li style="margin-bottom: 10px; padding: 10px; background-color: #f9f9f9; border-left: 3px solid #d9534f;">
+                <li style="margin-bottom: 10px; padding: 10px; background-color: #f9f9f9;">
                     <strong><?php echo esc_html($appointment->appointment); ?></strong><br>
                     <?php echo esc_html__('Date:', 'tmsm-appointment-cancelation'); ?> <?php echo esc_html($formatted_date); ?>
                     <?php if (!empty($formatted_time)) : ?>
@@ -54,7 +58,7 @@ if (! defined('ABSPATH')) {
         </ul>
         <p><?php
             // Le texte du lien
-            $link_text = esc_html__('ce lien', 'tmsm-appointment-cancelation');
+            $link_text = esc_html__('suivez-ce lien', 'tmsm-appointment-cancelation');
 
             // Créez le lien HTML simple
             $reschedule_html_link = '<a href="' . esc_url($resaspa_url) . '" style="color: #0073aa; text-decoration: none;">' . $link_text . '</a>';
@@ -62,16 +66,16 @@ if (! defined('ABSPATH')) {
             // Construisez la phrase avec sprintf et le lien HTML
             $translated_text = sprintf(
                 /* translators: %s: HTML link to the booking/rescheduling page */
-                esc_html__('Si vous souhaitez reprogrammer un nouveau rendez-vous, vous pouvez le faire directement en suivant %s.', 'tmsm-appointment-cancelation'),
+                esc_html__('Pour programmer un nouveau soin, %s.', 'tmsm-appointment-cancelation'),
                 $reschedule_html_link
             );
             echo $translated_text;
             ?></p>
         <p><?php
-            $link_to_admin_text = esc_html__('nous contacter', 'tmsm-appointment-cancelation');
+            $link_to_admin_text = esc_html__('Contactez-nous', 'tmsm-appointment-cancelation');
             $admin_email_link = '<a href="mailto:' . esc_html($shop_email) . '" style="color: #0073aa; text-decoration: none;">' . $link_to_admin_text . '</a>';
             $translated_contact_text = sprintf(
-                esc_html__('Si vous avez la moindre question n\' hésitez pas à %s.', 'tmsm-appointment-cancelation'),
+                esc_html__('Une question ? %s.', 'tmsm-appointment-cancelation'),
                 $admin_email_link
             );
             echo $translated_contact_text;
