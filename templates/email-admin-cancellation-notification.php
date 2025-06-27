@@ -59,18 +59,18 @@ if (! defined('ABSPATH')) {
                     <strong><?php echo esc_html($appointment->appointment); ?></strong><br>
                     <?php echo esc_html__('Date :', 'tmsm-appointment-cancelation'); ?> <?php echo esc_html($formatted_date); ?>
                     <?php if (!empty($formatted_time)) : ?>
-                        <br><?php echo esc_html__('Heure :', 'tmsm-appointment-cancelation'); ?> **<?php echo esc_html($formatted_time); ?>
+                        <br><?php echo esc_html__('Heure :', 'tmsm-appointment-cancelation'); ?> <?php echo esc_html($formatted_time); ?>
                     <?php endif; ?>
-                    <br><?php echo esc_html__('ID de rendez-vous :', 'tmsm-appointment-cancelation'); ?> **<?php echo esc_html($appointment->id); ?>
+                    <br><?php echo esc_html__('ID de rendez-vous :', 'tmsm-appointment-cancelation'); ?> <?php echo esc_html($appointment->id); ?>
                     <?php if (isset($appointment->location) && !empty($appointment->location)) : ?>
-                        <br><?php echo esc_html__('Emplacement :', 'tmsm-appointment-cancelation'); ?> **<?php echo esc_html($appointment->location); ?>
+                        <br><?php echo esc_html__('Emplacement :', 'tmsm-appointment-cancelation'); ?> <?php echo esc_html($appointment->location); ?>
                     <?php endif; ?>
                 </li>
             <?php endforeach; ?>
         </ul>
 
         <?php if (!empty($client_email)) : ?>
-            <p><?php echo esc_html__('Email du client :', 'tmsm-appointment-cancelation'); ?> <a href="mailto:<?php echo esc_attr($client_email); ?>" style="color:rgb(0, 115, 170); text-decoration: none;">**<?php echo esc_html($client_email); ?></a></p>
+            <p><?php echo esc_html__('Email du client :', 'tmsm-appointment-cancelation'); ?> <a href="mailto:<?php echo esc_attr($client_email); ?>" style="color:rgb(0, 115, 170); text-decoration: none;"><?php echo esc_html($client_email); ?></a></p>
         <?php endif; ?>
 
         <p><?php echo esc_html__('Veuillez vérifier votre système de rendez-vous pour plus de détails concernant cette annulation.', 'tmsm-appointment-cancelation'); ?></p>

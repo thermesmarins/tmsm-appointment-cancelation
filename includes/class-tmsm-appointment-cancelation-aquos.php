@@ -1,13 +1,21 @@
 <?php
+declare(strict_types=1);
 
 /**
  * This file is part of the TMSM Appointment Cancelation plugin.
- * 
- * It handles the Aquos connexions and the appointment cancelation process.
- * 
+ * Handles Aquos API connections and appointment cancellation process.
  */
 class Tmsm_Appointment_Cancelation_Aquos
 {
+    // Site IDs as class constants
+    const SITE_ID_AQREN = 0;
+    const SITE_ID_AQVE = 2;
+    const SITE_ID_AQNA = 5;
+    const SITE_ID_TEST = 10;
+
+    // Set to true for test mode, false for production
+    const TEST_MODE = true; // Change to true for test environment
+
     private $aquos_cancelation_url;
     private $aquos_appointment_delay;
     private $aquos_daily_appointment_url;
@@ -28,111 +36,84 @@ class Tmsm_Appointment_Cancelation_Aquos
         $this->aquos_appointment_date = $appointment_date;
 
         $options = get_option('tmsm_appointment_cancelation_options');
-        $this->aquos_cancelation_url = isset($options['aquos_appointment_cancellation_url']) ? esc_attr($options['aquos_appointment_cancellation_url']) : '';
+        $this->aquos_cancelation_url = isset($options['aquos_appointment_cancellation_url']) ? esc_url_raw($options['aquos_appointment_cancellation_url']) : '';
         $this->aquos_appointment_delay = isset($options['aquos_appointment_cancellation_deadline']) ? esc_attr($options['aquos_appointment_cancellation_deadline']) : '';
-        $this->aquos_daily_appointment_url = isset($options['aquos_appointment_daily_url']) ? esc_attr($options['aquos_appointment_daily_url']) : '';
+        $this->aquos_daily_appointment_url = isset($options['aquos_appointment_daily_url']) ? esc_url_raw($options['aquos_appointment_daily_url']) : '';
         $this->aquos_security_token = isset($options['aquos_appointment_cancellation_token']) ? esc_attr($options['aquos_appointment_cancellation_token']) : '';
 
         $this->aquos_sites = array(
-            // TODO Mettre 10 pour les tests
-            'AQREN' => 10,
-            'AQVE'  => 2,
-            'AQNA'  => 5,
+            'AQREN' => self::SITE_ID_AQREN,
+            'AQVE'  => self::SITE_ID_AQVE,
+            'AQNA'  => self::SITE_ID_AQNA,
         );
-        // Extraire l'ID numérique de l'ID fonctionnel
+        // If in test mode, override AQREN site ID for testing
+        if (self::TEST_MODE) {
+            $this->aquos_sites['AQREN'] = self::SITE_ID_TEST; // Use test site ID
+        }
         $this->aquos_appointment_id = $this->extract_appointment_id_from_fonctional_id($this->aquos_fonctionnal_id);
         $site_code_extracted = $this->extract_site_code_from_fonctionnal_id($this->aquos_fonctionnal_id);
         $this->aquos_site_id = $this->get_site_id_from_code($site_code_extracted);
     }
-    /**
-     * Extrait le code du site (lettres majuscules) d'un token.
-     * C'est une méthode privée car elle est une aide interne à la classe.
-     *
-     * @param string $aquos_fonctionnal_id Le token complet (ex: "125456AQREN").
-     * @return string|null Le code du site (ex: "AQREN") ou null si non trouvé.
-     */
-    private function extract_site_code_from_fonctionnal_id($aquos_fonctionnal_id)
-    {
-        // L'expression régulière cherche une ou plusieurs lettres majuscules (A-Z)
-        // à la fin de la chaîne ($).
-        $pattern = '/([A-Z]+)$/';
 
+    private function extract_site_code_from_fonctionnal_id($aquos_fonctionnal_id): ?string
+    {
+        $pattern = '/([A-Z]+)$/';
         if (preg_match($pattern, $aquos_fonctionnal_id, $matches)) {
             return $matches[1];
         }
         return null;
     }
 
-    /**
-     * Extrait la partie numérique d'un ID fonctionnel.
-     *
-     * @param string $fonctional_id Le ID fonctionnel complet (ex: "156786AQREN").
-     * @return int|null La partie numérique (ex: 156786) ou null si non trouvée.
-     */
-    private function extract_appointment_id_from_fonctional_id($fonctional_id)
+    private function extract_appointment_id_from_fonctional_id($fonctional_id): ?int
     {
-        // L'expression régulière cherche une ou plusieurs chiffres (0-9)
-        // au début de la chaîne (^)
         $pattern = '/^([0-9]+)/';
         if (preg_match($pattern, $fonctional_id, $matches)) {
-            return (int) $matches[1]; // Cast en entier
+            return (int) $matches[1];
         }
         return null;
     }
-    public function get_aquos_appointment_id()
+
+    public function get_aquos_appointment_id(): ?int
     {
         return $this->aquos_appointment_id;
     }
-    /**
-     * Récupère l'ID numérique du site à partir de son code (lettres).
-     * C'est une méthode privée car elle est une aide interne à la classe.
-     *
-     * @param string|null $site_code Le code du site (ex: "AQREN").
-     * @return int|null L'ID numérique du site (ex: 0) ou null si non trouvé.
-     */
-    private function get_site_id_from_code($site_code)
+
+    private function get_site_id_from_code($site_code): ?int
     {
         if ($site_code !== null && isset($this->aquos_sites[$site_code])) {
             return $this->aquos_sites[$site_code];
         }
         return null;
     }
-    /**
-     * Méthode publique pour récupérer l'ID du site, si nécessaire depuis l'extérieur.
-     *
-     * @return int|null L'ID du site ou null.
-     */
-    public function get_aquos_site_id()
+
+    public function get_aquos_site_id(): ?int
     {
         return $this->aquos_site_id;
     }
-    /**
-     * Méthode publique pour récupérer l'URL d'annulation Aquos.
-     *
-     * @return string L'URL d'annulation Aquos.
-     */
-    public function get_aquos_security_token()
+
+    public function get_aquos_security_token(): string
     {
         return $this->aquos_security_token;
     }
-    public function get_customer_identity()
+
+    public function get_customer_identity(): ?string
     {
         return $this->customer_identity;
     }
-    /**
-     * Méthode publique pour récupérer l'URL d'annulation Aquos.
-     *
-     * @return string L'URL d'annulation Aquos.
-     */
-    public function get_aquos_appointment_date()
+
+    public function get_aquos_appointment_date(): ?string
     {
         $date = DateTime::createFromFormat('Y.m.d', $this->aquos_appointment_date);
+        if (!$date) {
+            $this->log('Invalid appointment date format: ' . $this->aquos_appointment_date, 'error');
+            return null;
+        }
         return $date->format('Ymd');
     }
-    public function get_formatted_date($date)
+
+    public function get_formatted_date($date): ?string
     {
         $date_obj = DateTime::createFromFormat('Ymd', $date);
-        // return $date->format('d-m-Y');
         if ($date_obj) {
             $mois_fr = array(
                 1  => 'janvier',
@@ -155,41 +136,31 @@ class Tmsm_Appointment_Cancelation_Aquos
 
             return $jour . ' ' . $mois_fr[$mois_numero] . ' ' . $annee;
         } else {
-            error_log("Erreur de format de date pour: " . $date);
+            $this->log('Date format error for: ' . $date, 'error');
             return null;
         }
     }
 
-    /**
-     * Methode publique pour récupérer les rendez-vous de l'utilsateur de la journée depuis Aquos
-     *
-     * @return array
-     */
-    public function get_user_appointments()
+    public function get_user_appointments(): array
     {
         $appointments = $this->get_daily_appointments();
-        error_log('Appointments from Aquos: ' . print_r($appointments, true));
+        $this->log('Appointments from Aquos: ' . print_r($appointments, true), 'info');
         if (empty($appointments) || isset($appointments->ErrorMessage)) {
-            return []; // Si pas de rendez-vous ou erreur, retourner un tableau vide
+            return [];
         } else {
             $this->customer_identity =  tmsm_set_formatted_identity(
                 $appointments->appointments[0]->customer_civility ?? '',
                 $appointments->appointments[0]->customer_lastname ?? '',
                 $appointments->appointments[0]->customer_firstname ?? ''
             );
-            error_log('Customer identity from Aquos: ' . $this->customer_identity);
+            $this->log('Customer identity from Aquos: ' . $this->customer_identity, 'info');
             return $appointments->appointments;
         }
     }
-   
-    /**
-     * Methode privée pour récupérer la signature du rendez-vous pour l'appel vers Aquos
-     *
-     * @return void
-     */
+
     private function get_daily_appointments()
     {
-        $site_id =  $this->aquos_site_id; // mettre 10 pour les tests
+        $site_id =  $this->aquos_site_id;
         $appointment_id =  $this->aquos_appointment_id;
         $date =  $this->get_aquos_appointment_date();
         $appointment_signature = $this->aquos_appointment_signature;
@@ -205,90 +176,58 @@ class Tmsm_Appointment_Cancelation_Aquos
         return $response;
     }
 
-    /**
-     * Vérifie si un rendez-vous peut être annulé en fonction d'un délai horaire.
-     *
-     * @param string $appointment_date_str La date du rendez-vous au format YYYYMMDD (ex: '20250613').
-     * @param string $appointment_time_str L'heure du rendez-vous au format HHMM (ex: '1400').
-     * @param int    $delay_hours Le délai en heures avant le rendez-vous (ex: 24 ou 48).
-     * @return bool True si le rendez-vous peut être annulé, false sinon.
-     */
     public function can_appointment_be_cancelled(
-        $appointment_date_str,
-        $appointment_time_str,
-        $delay_hours
-    ) {
-        // 1. Obtenir l'heure actuelle
+        string $appointment_date_str,
+        string $appointment_time_str,
+        int $delay_hours
+    ): bool {
         $now = new DateTime();
-
-        // 2. Créer l'objet DateTime complet pour le rendez-vous
-        // Assure-toi que appointment_time_str est bien HHMM (ex: "1400")
-        $appointment_datetime_combined = $appointment_date_str . $appointment_time_str . '00'; // Ajoute les secondes si manquantes
-
-        // Le format 'YmdHis' correspond à YYYYMMDDHHMMSS
+        $appointment_datetime_combined = $appointment_date_str . $appointment_time_str . '00';
         $appointment_start_time = DateTime::createFromFormat('YmdHis', $appointment_datetime_combined);
-
         if (!$appointment_start_time) {
-            error_log('Erreur: Impossible de parser la date/heure du rendez-vous: ' . $appointment_datetime_combined);
-            return false; // Date ou heure de rendez-vous invalide
+            $this->log('Error: Unable to parse appointment date/time: ' . $appointment_datetime_combined, 'error');
+            return false;
         }
-
-        // 3. Calculer la date limite d'annulation
-        // On clone l'objet pour ne pas modifier l'original $appointment_start_time
-        // On soustrait le délai en heures du temps du rendez-vous.
         $cancel_deadline_interval = new DateInterval('PT' . $delay_hours . 'H');
         $cancellation_deadline = (clone $appointment_start_time)->sub($cancel_deadline_interval);
-        // 4. Comparer l'heure actuelle avec la date limite d'annulation
         if ($now < $cancellation_deadline) {
-            // L'heure actuelle est AVANT la date limite d'annulation
-            error_log(
-                'Le rendez-vous (débute le ' . $appointment_start_time->format('Y-m-d H:i') . ') ' .
-                    'peut être annulé. Date limite d\'annulation: ' . $cancellation_deadline->format('Y-m-d H:i') .
-                    '. Heure actuelle: ' . $now->format('Y-m-d H:i')
+            $this->log(
+                'Appointment (starts at ' . $appointment_start_time->format('Y-m-d H:i') . ') can be cancelled. Cancellation deadline: ' . $cancellation_deadline->format('Y-m-d H:i') . '. Current time: ' . $now->format('Y-m-d H:i'),
+                'info'
             );
             return true;
         } else {
-            // L'heure actuelle est APRES ou ÉGALE à la date limite d'annulation
-            error_log(
-                'Le rendez-vous (débute le ' . $appointment_start_time->format('Y-m-d H:i') . ') ' .
-                    'ne peut PAS être annulé. Date limite d\'annulation: ' . $cancellation_deadline->format('Y-m-d H:i') .
-                    '. Heure actuelle: ' . $now->format('Y-m-d H:i')
+            $this->log(
+                'Appointment (starts at ' . $appointment_start_time->format('Y-m-d H:i') . ') cannot be cancelled. Cancellation deadline: ' . $cancellation_deadline->format('Y-m-d H:i') . '. Current time: ' . $now->format('Y-m-d H:i'),
+                'info'
             );
             return false;
         }
     }
-    /**
-     * Méthode publique pour annuler un ou plusieurs rendez-vous
-     *
-     * @param array $appointment_id
-     * @return bool|WP_Error
-     */
+
     public function cancel_appointment(array $appointment_id)
     {
         $site_id = $this->aquos_site_id;
-        error_log('Aquos site ID cancel method: ' . $site_id);
-        error_log('Appointment ID to cancel: ' . print_r($appointment_id, true));
-        // Vérifier si l'ID de rendez-vous est défini
+        $this->log('Aquos site ID cancel method: ' . $site_id, 'info');
+        $this->log('Appointment ID to cancel: ' . print_r($appointment_id, true), 'info');
         if (empty($this->aquos_appointment_id)) {
-            error_log('L\'ID de rendez-vous est vide ou non défini.');
-            return new WP_Error('invalid_appointment_id', 'L\'ID de rendez-vous est vide ou non défini.');
+            $this->log('Appointment ID is empty or not set.', 'error');
+            return new WP_Error('invalid_appointment_id', 'Appointment ID is empty or not set.');
         }
-        // todo : modifier pour la prod site = 10 pour les tests
-        if ($site_id != 10 && !isset($this->aquos_sites[$site_id])) {
-            error_log('L\'ID de site Aquos est invalide: ' . $site_id);
-            return new WP_Error('invalid_site_id', 'L\'ID de site Aquos est invalide.');
+        if (
+            (!self::TEST_MODE && !in_array($site_id, $this->aquos_sites, true)) ||
+            (self::TEST_MODE && $site_id !== self::SITE_ID_TEST)
+        ) {
+            $this->log('Invalid Aquos site ID: ' . $site_id, 'error');
+            return new WP_Error('invalid_site_id', 'Invalid Aquos site ID.');
         }
-        $ids = array();
         $response = array();
         foreach ($appointment_id as $id) {
-            $ids[] = $id;
-            // Vérifier si l'ID de rendez-vous est un entier
             $id_int = intval($id);
             if ($id_int <= 0) {
-                error_log('L\'ID de rendez-vous doit être un entier positif. ID fourni: ' . $id);
-                return new WP_Error('invalid_appointment_id', 'L\'ID de rendez-vous doit être un entier positif.');
+                $this->log('Appointment ID must be a positive integer. Provided: ' . $id, 'error');
+                return new WP_Error('invalid_appointment_id', 'Appointment ID must be a positive integer.');
             }
-            // Préparer les données pour l'annulation
             $data = array(
                 'id_site' => $this->aquos_site_id,
                 'appointment_id' => $id_int,
@@ -298,45 +237,32 @@ class Tmsm_Appointment_Cancelation_Aquos
             $method = 'DELETE';
             $response[] = $this->_make_aquos_api_request($json_body, $signature, $method);
         }
-        error_log('Response from Aquos API after cancellation: ' . print_r($response, true));
         $error = array();
         foreach ($response as $res) {
-            error_log('response error: ' . print_r($res->Status, true) . gettype($res->Status));
-            if ($res->Status == true) {
+            $status = is_object($res) && isset($res->Status) ? $res->Status : false;
+            if ($status === true) {
                 $error[] = false;
             } else {
                 $error[] = true;
-                error_log('Erreur lors de l\'annulation du rendez-vous: ' . print_r($res, true));
-                return new WP_Error('cancellation_error', 'Erreur lors de l\'annulation du rendez-vous: ' . print_r($res, true));
+                $this->log('Error cancelling appointment: ' . print_r($res, true), 'error');
+                return new WP_Error('cancellation_error', 'Error cancelling appointment: ' . print_r($res, true));
             }
         }
-        if (in_array(true, $error)) {
-            error_log('Une ou plusieurs annulations ont échoué.');
-            return false; // Au moins une annulation a échoué
+        if (in_array(true, $error, true)) {
+            $this->log('One or more cancellations failed.', 'error');
+            return false;
         } else {
-
-            error_log('Toutes les annulations ont réussi.');
-            return true; // Toutes les annulations ont réussi
+            $this->log('All cancellations succeeded.', 'info');
+            return true;
         }
     }
-    /** Generate HMAC signature
-     *
-     * @param string $json_body
-     * @return string
-     */
-    private function generate_hmac_signature($json_body)
+
+    private function generate_hmac_signature($json_body): string
     {
-        $secret_token = $this->aquos_security_token;
         $hmacSignature = hash_hmac('sha256', $json_body, $this->aquos_security_token, true);
         return base64_encode($hmacSignature);
     }
-    /**
-     * Private function to get the appointments from Aquos
-     *
-     * @param [string] $json_body
-     * @param [string] $signature
-     * @return void
-     */
+
     private function _make_aquos_api_request($json_body, $signature, $method = 'POST')
     {
         if ($method === 'POST') {
@@ -344,44 +270,56 @@ class Tmsm_Appointment_Cancelation_Aquos
         } elseif ($method === 'DELETE') {
             $url = $this->aquos_cancelation_url;
         } else {
-            error_log('Méthode HTTP non supportée: ' . $method);
-            return new WP_Error('unsupported_method', 'Méthode HTTP non supportée: ' . $method);
+            $this->log('Unsupported HTTP method: ' . $method, 'error');
+            return new WP_Error('unsupported_method', 'Unsupported HTTP method: ' . $method);
         }
-        error_log('Aquos API URL: ' . $url);
+        $this->log('Aquos API URL: ' . $url, 'info');
         $headers = [
             'Content-Type' => 'application/json; charset=utf-8',
             'X-Signature' => $signature,
             'Cache-Control' => 'no-cache',
         ];
-
-
+        $sslverify = true;
+        if (self::TEST_MODE) {
+            $sslverify = false;
+        }
         $response = wp_remote_request($url, array(
             'method' => $method,
             'body' => $json_body,
             'headers' => $headers,
-            'timeout' => 30, // Timeout de 30 secondes
-            'sslverify' => false, // Désactiver la vérification SSL pour les environnements de développement
+            'timeout' => 30,
+            'sslverify' => $sslverify,
         ));
-        // Vérifier si la requête a échoué
         if (is_wp_error($response)) {
-            error_log('Erreur lors de l\'appel API Aquos: ' . $response->get_error_message());
-            return new WP_Error('api_request_error', 'Erreur lors de l\'appel API Aquos: ' . $response->get_error_message());
+            $this->log('Error calling Aquos API: ' . $response->get_error_message(), 'error');
+            return new WP_Error('api_request_error', 'Error calling Aquos API: ' . $response->get_error_message());
         }
-        // Vérifier le code de statut HTTP
         $http_code = wp_remote_retrieve_response_code($response);
         if ($http_code < 200 || $http_code >= 300) {
-            error_log("L'API Aquos a retourné un code d'erreur HTTP $http_code. Réponse brute: " . wp_remote_retrieve_body($response));
-            return new WP_Error('api_response_error', 'L\'API Aquos a retourné une erreur HTTP: ' . $http_code);
+            $this->log('Aquos API returned HTTP error code ' . $http_code . '. Raw response: ' . wp_remote_retrieve_body($response), 'error');
+            return new WP_Error('api_response_error', 'Aquos API returned HTTP error: ' . $http_code);
         }
-        // Décoder la réponse JSON
+        $content_type = wp_remote_retrieve_header($response, 'content-type');
         $response_body = wp_remote_retrieve_body($response);
+        if (strpos($content_type, 'application/json') === false) {
+            $this->log('Unexpected content type from Aquos API: ' . $content_type . '. Response: ' . $response_body, 'error');
+            return new WP_Error('unexpected_content_type', 'Unexpected content type from Aquos API.');
+        }
         $data = json_decode($response_body);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            error_log('Erreur de décodage JSON de la réponse API Aquos: ' . json_last_error_msg());
-            error_log('Réponse reçue (non-JSON): ' . $response_body); // Log la réponse complète pour débogage
-            return new WP_Error('json_decode_error', 'Impossible de décoder la réponse JSON de l\'API Aquos.');
+            $this->log('JSON decode error from Aquos API: ' . json_last_error_msg() . '. Response: ' . $response_body, 'error');
+            return new WP_Error('json_decode_error', 'Unable to decode JSON response from Aquos API.');
         }
-        // Retourner les données décodées
         return $data;
+    }
+
+    private function log($message, $level = 'info')
+    {
+        if (function_exists('wc_get_logger')) {
+            $logger = wc_get_logger();
+            $logger->log($level, $message, array('source' => 'tmsm-appointment-cancelation-aquos'));
+        } else {
+            error_log('[' . strtoupper($level) . '] TMSM Appointment Cancelation Aquos: ' . $message);
+        }
     }
 }

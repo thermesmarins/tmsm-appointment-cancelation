@@ -152,13 +152,18 @@ class Tmsm_Appointment_Cancelation_Public
             $aquos_cancel_appointments = new Tmsm_Appointment_Cancelation_Aquos($fonctionnal_id);
             $site_id = isset($_POST['site_id']) ? sanitize_text_field($_POST['site_id']) : '';
             $cancel_status = false;
-            // $cancel_status = $aquos_cancel_appointments->cancel_appointment($appointment_ids);
+            if ($site_id == Tmsm_Appointment_Cancelation_Aquos::SITE_ID_TEST) {
+                error_log('Annulation des rendez-vous en mode test');
+                $cancel_status = $aquos_cancel_appointments->cancel_appointment($appointment_ids);
+            } else {
+                $cancel_status = false;
+            }
             $user_email = isset($_POST['email_confirm']) ? sanitize_email($_POST['email_confirm']) : '';
             $customer_name = isset($_POST['customer_name']) ? sanitize_text_field($_POST['customer_name']) : '';
             error_log('Email de l\'utilisateur : ' . $user_email);
             error_log('Nom du client : ' . $customer_name);
             $redirect_url_base = home_url('/rdv/');
-            $cancel_status = true; // Simuler le succès de l'annulation pour les tests
+            // $cancel_status = true; // Simuler le succès de l'annulation pour les tests
             // Ajouter le statut de l'annulation
             if ($cancel_status) {
                 $appointments_details = $cancelled_appointments_details;
@@ -186,7 +191,7 @@ class Tmsm_Appointment_Cancelation_Public
      */
     public function tmsm_handle_user_appointments_content($content)
     {
-        // https://aquatonic.local/rdv/?f=305402AQREN&t=65oPTMLgoZ&d=2025.06.23
+        // https://aquatonic.local/rdv/?f=304409AQREN&t=h6Ejsl0wkq&d=2025.06.29
         global $wp_query;
         $output = '';
         if (isset($_GET['cancel_status'])) {
