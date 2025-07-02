@@ -164,7 +164,6 @@ class Tmsm_Appointment_Cancelation {
 	 *
 	 * @since    1.0.0
 	 * @access   private
-	 * @return   void
 	 */
 	private function set_locale() {
 		$plugin_i18n = new Tmsm_Appointment_Cancelation_i18n();

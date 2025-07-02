@@ -114,8 +114,6 @@ class Tmsm_Appointment_Cancelation_Public
      */
     public function handle_cancel_appointment_action()
     {
-        error_log('*** handle_cancel_appointment_action() called ***');
-        error_log('POST ACTION: ' . print_r($_POST, true));
         if (isset($_POST['action']) && $_POST['action'] === 'annuler_rendez_vous' && isset($_POST['appointment_ids'])) {
             // Vérifier le nonce pour la sécurité
             if (! isset($_POST['tmsm_cancel_nonce']) || ! wp_verify_nonce($_POST['tmsm_cancel_nonce'], 'annuler_rendez_vous_action')) {
@@ -160,8 +158,6 @@ class Tmsm_Appointment_Cancelation_Public
             }
             $user_email = isset($_POST['email_confirm']) ? sanitize_email($_POST['email_confirm']) : '';
             $customer_name = isset($_POST['customer_name']) ? sanitize_text_field($_POST['customer_name']) : '';
-            error_log('Email de l\'utilisateur : ' . $user_email);
-            error_log('Nom du client : ' . $customer_name);
             $redirect_url_base = home_url('/rdv/');
             // $cancel_status = true; // Simuler le succès de l'annulation pour les tests
             // Ajouter le statut de l'annulation
