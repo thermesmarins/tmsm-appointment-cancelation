@@ -204,7 +204,7 @@ class Tmsm_Appointment_Cancelation_Public
             }
             return $output;
         }
-        if (is_page('vos-rendez-vous') || is_page('rdv') && isset($wp_query->query_vars['f']) && isset($wp_query->query_vars['t']) && isset($wp_query->query_vars['d'])) {
+        if (is_page('vos-rendez-vous') || is_page('rdv') && isset($wp_query->query_vars['f']) && isset($wp_query->query_vars['t'])) {
             $fonctionnal_id = get_query_var('f');
             $aquos_appointment_signature = get_query_var('t');
             if (!empty($aquos_appointment_signature) && strpos($aquos_appointment_signature, ' ') !== false) {
@@ -212,10 +212,11 @@ class Tmsm_Appointment_Cancelation_Public
                 $aquos_appointment_signature = str_replace(' ', '+', $aquos_appointment_signature);
                 error_log('Signature après correction des espaces -> + : ' . $aquos_appointment_signature);
             }
-            $date = get_query_var('d');
+            // $date = get_query_var('d');
             $date_to_show = '';
             if (is_null($this->aquos_api_handler)) {
-                $this->aquos_api_handler = new Tmsm_Appointment_Cancelation_Aquos($fonctionnal_id, $aquos_appointment_signature, $date);
+                $this->aquos_api_handler = new Tmsm_Appointment_Cancelation_Aquos($fonctionnal_id, $aquos_appointment_signature);
+                // $this->aquos_api_handler = new Tmsm_Appointment_Cancelation_Aquos($fonctionnal_id, $aquos_appointment_signature, $date);
 
                 // Messages de log à exécuter une seule fois lors de la création de l'instance
                 error_log('ID Fonctionnel Complet : ' . $fonctionnal_id);
@@ -232,15 +233,16 @@ class Tmsm_Appointment_Cancelation_Public
                 }
                 // Utiliser les rendez-vous en cache
                 $appointments = $this->user_appointments_cache;
-                $date_to_show = $this->aquos_api_handler->get_formatted_date($this->aquos_api_handler->get_aquos_appointment_date());
+                $date_to_show = ($appointments[0]->appointment_date != null) ? $this->aquos_api_handler->get_formatted_date($appointments[0]->appointment_date) : '';
                 $client_name = $this->aquos_api_handler->get_customer_identity() ?? '';
                 $appointment_ids = [];
-                $output = '<p>' . sprintf(__('Hello %s <br/> your reservation for %s', 'tmsm-appointment-cancelation'), $client_name, esc_html($date_to_show)) . '</p>';
+                // $output = !empty($date_to_show) ? '<p>' . sprintf(__('Hello %s <br/> your reservation for %s', 'tmsm-appointment-cancelation'), $client_name, esc_html($date_to_show)) . '</p>' : "";
                 if (! empty($appointments) && isset($appointments[0]->id)) {
                     $any_cancellable_appointment = false; // Flag pour savoir si au moins un RDV est annulable
                     $current_user_email = $appointments[0]->email ?? ''; // Récupère l'email du premier RDV pour vérification
                     $options = get_option('tmsm_appointment_cancelation_options');
                     $cancel_delay_hours = isset($options['aquos_appointment_cancellation_deadline']) ? $options['aquos_appointment_cancellation_deadline'] : 24; // Valeur par défaut de 24h
+                    $output .= '<p>' . sprintf(__('Hello %s <br/> your reservation for %s', 'tmsm-appointment-cancelation'), $client_name, esc_html($date_to_show)) . '</p>';
                     foreach ($appointments as $appointment) {
                         $output .= '<li>' . esc_html($appointment->appointment) .  '</li>';
                         $appointment_ids[] = $appointment->id;
@@ -305,6 +307,7 @@ class Tmsm_Appointment_Cancelation_Public
                 } else {
                     $output .= '<p>' . __('There are no appointments on this date, please contact us if needed.', 'tmsm-appointment-cancelation') . '</p>';
                 }
+                
                 return $output;
             } else {
                 return '<p>' . __('Your login is invalid.', 'tmsm-appointment-cancelation') . '</p>';

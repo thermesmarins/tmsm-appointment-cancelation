@@ -103,6 +103,7 @@ class Tmsm_Appointment_Cancelation_Aquos
 
     public function get_aquos_appointment_date(): ?string
     {
+        if ($this->aquos_appointment_date != null) {
         $date = DateTime::createFromFormat('Y.m.d', $this->aquos_appointment_date);
         if (!$date) {
             $this->log('Invalid appointment date format: ' . $this->aquos_appointment_date, 'error');
@@ -110,6 +111,9 @@ class Tmsm_Appointment_Cancelation_Aquos
         }
         return $date->format('Ymd');
     }
+    return '';
+    
+}
 
     public function get_formatted_date($date): ?string
     {
@@ -162,12 +166,12 @@ class Tmsm_Appointment_Cancelation_Aquos
     {
         $site_id =  $this->aquos_site_id;
         $appointment_id =  $this->aquos_appointment_id;
-        $date =  $this->get_aquos_appointment_date();
+        // $date =  $this->get_aquos_appointment_date();
         $appointment_signature = $this->aquos_appointment_signature;
         $appointment_array = array(
             'id_site' => $site_id,
             'appointment_id' => $appointment_id,
-            'appointment_date' => $date,
+            // 'appointment_date' => $date,
             'appointment_signature' => $appointment_signature,
         );
         $json_body = json_encode($appointment_array);
