@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Blank WordPress Pot v1.0.0\n"
 "Report-Msgid-Bugs-To: Translator Name <translations@example.com>\n"
-"POT-Creation-Date: 2025-06-17 16:47+0200\n"
+"POT-Creation-Date: 2025-07-03 12:04+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: Your Team <translations@example.com>\n"
@@ -65,7 +65,7 @@ msgid ""
 "The email address from which cancellation emails are sent. Use a valid "
 "email, preferably from your domain, to improve deliverability."
 msgstr ""
-"L'adresse électronique à partir de laquelle les courriels d'annulation sont "
+"L'adresse email à partir de laquelle les courriels d'annulation sont "
 "envoyés. Utilisez une adresse e-mail valide, de préférence de votre domaine, "
 "afin d'améliorer la délivrabilité."
 
@@ -90,7 +90,6 @@ msgid "Subject line for the client cancellation confirmation email."
 msgstr "Objet de l'e-mail de confirmation de l'annulation du client."
 
 #: admin/class-tmsm-appointment-cancelation-admin.php:153
-#: includes/class-tmsm-appointment-cancelation-customer-email.php:37
 msgid "Your Appointment Cancellation Confirmation"
 msgstr "Confirmation de l'annulation de votre rendez-vous"
 
@@ -105,11 +104,11 @@ msgstr "Activer l'e-mail de l'administrateur"
 #: admin/class-tmsm-appointment-cancelation-admin.php:173
 msgid "Send a notification email to the administrator after cancellation."
 msgstr ""
-"Envoyer un courriel de notification à l'administrateur après l'annulation."
+"Envoyer un email de notification à l'administrateur après l'annulation."
 
 #: admin/class-tmsm-appointment-cancelation-admin.php:180
 msgid "Admin Recipient Email(s)"
-msgstr "Courriel(s) de l'administrateur destinataire"
+msgstr "Email(s) de l'administrateur destinataire"
 
 #: admin/class-tmsm-appointment-cancelation-admin.php:186
 msgid ""
@@ -128,9 +127,6 @@ msgid "Subject line for the admin cancellation notification email."
 msgstr "Objet de l'e-mail de notification d'annulation de l'administrateur."
 
 #: admin/class-tmsm-appointment-cancelation-admin.php:201
-#: includes/class-tmsm-appointment-cancelation-admin-email.php:32
-#: templates/email-admin-cancellation-notification.php:42
-#: templates/email-admin-cancellation-notification.php:46
 msgid "Appointment Cancellation Notification"
 msgstr "Notification d'annulation de rendez-vous"
 
@@ -162,24 +158,238 @@ msgstr "Annulation de rendez-vous"
 msgid "Save Parameters"
 msgstr "Sauvegarde des paramètres"
 
+#: includes/class-tmsm-appointment-cancelation-activator.php:66
+msgid "WordPress 5.0 or higher is required."
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-activator.php:71
+msgid "PHP 7.4 or higher is required."
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-activator.php:76
+msgid "cURL extension is required for API communication."
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-activator.php:83
+msgid "Plugin Activation Error"
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-activator.php:84
+msgid ""
+"The TMSM Appointment Cancelation plugin could not be activated due to the "
+"following issues:"
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-activator.php:86
+msgid "Return to plugins page"
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-admin-email.php:32
+#: templates/email-admin-cancellation-notification.php:42
+#: templates/email-admin-cancellation-notification.php:46
+msgid "Notification d'annulation de rendez-vous"
+msgstr ""
+
 #: includes/class-tmsm-appointment-cancelation-admin-email.php:81
 msgid "An appointment has been cancelled on your website."
 msgstr "Un rendez-vous a été annulé sur votre site web."
 
 #: includes/class-tmsm-appointment-cancelation-admin-email.php:82
-#: templates/email-admin-cancellation-notification.php:73
 msgid "Client Email:"
-msgstr "Courriel du client :"
+msgstr "Email du client :"
 
 #: includes/class-tmsm-appointment-cancelation-admin-email.php:83
 msgid "Cancelled appointments:"
 msgstr "Rendez-vous annulés :"
 
-#: includes/class-tmsm-appointment-cancelation-customer-email.php:89
+#: includes/class-tmsm-appointment-cancelation-config.php:192
+msgid "API endpoint must be a valid URL."
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:197
+msgid "Admin email must be a valid email address."
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:201
+msgid "From email address must be a valid email address."
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:208
+#, php-format
+msgid "%s must be a positive number."
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:216
+#, php-format
+msgid "%s must be a boolean value."
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:232
+msgid "API Configuration"
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:235
+msgid "API Endpoint"
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:237
+msgid "The Aquos API endpoint URL."
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:241
+msgid "API Key"
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:243
+msgid "Your Aquos API authentication key."
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:247
+msgid "API Timeout (seconds)"
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:249
+msgid "Timeout for API requests in seconds."
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:256
+msgid "Security Settings"
+msgstr "Paramètres Globaux"
+
+#: includes/class-tmsm-appointment-cancelation-config.php:259
+msgid "Token Expiry (hours)"
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:261
+msgid "How long cancellation tokens remain valid."
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:266
+msgid "Enable Rate Limiting"
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:268
+msgid "Limit the number of cancellation attempts per hour."
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:271
+msgid "Max Attempts per Hour"
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:273
+msgid "Maximum cancellation attempts allowed per hour per IP."
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:280
+msgid "Email Settings"
+msgstr "Paramètres Généraux des Emails"
+
+#: includes/class-tmsm-appointment-cancelation-config.php:283
+msgid "Admin Email"
+msgstr "Activer l'e-mail de l'administrateur"
+
+#: includes/class-tmsm-appointment-cancelation-config.php:285
+msgid "Email address for admin notifications."
+msgstr "Adresse email pour la notification admin"
+
+#: includes/class-tmsm-appointment-cancelation-config.php:288
+msgid "Enable Email Notifications"
+msgstr "Activer l'email de confirmation d'annulation du client"
+
+#: includes/class-tmsm-appointment-cancelation-config.php:290
+msgid "Send email notifications for cancellations."
+msgstr ""
+"Envoyer un email de notification à l'administrateur après l'annulation."
+
+#: includes/class-tmsm-appointment-cancelation-config.php:293
+msgid "From Name"
+msgstr "Expéditeur"
+
+#: includes/class-tmsm-appointment-cancelation-config.php:295
+msgid "Name to use in email from field."
+msgstr "Nom à utiliser pour le champs d'expéditeur."
+
+#: includes/class-tmsm-appointment-cancelation-config.php:298
+msgid "From Email"
+msgstr "Expéditeur"
+
+#: includes/class-tmsm-appointment-cancelation-config.php:300
+msgid "Email address to use in from field."
+msgstr "Email à utiliser pour le champs d'expéditeur."
+
+#: includes/class-tmsm-appointment-cancelation-config.php:305
+msgid "Display Settings"
+msgstr "Paramètres d'affichage"
+
+#: includes/class-tmsm-appointment-cancelation-config.php:308
+msgid "Page Title"
+msgstr "Titre de la page"
+
+#: includes/class-tmsm-appointment-cancelation-config.php:310
+msgid "Title displayed on the cancellation page."
+msgstr "Titre à afficher sur la page d'annulation."
+
+#: includes/class-tmsm-appointment-cancelation-config.php:313
+msgid "Success Message"
+msgstr "Message de réussite"
+
+#: includes/class-tmsm-appointment-cancelation-config.php:315
+msgid "Message displayed when cancellation is successful."
+msgstr "Message à afficher quand l'annulation s'est bien passée."
+
+#: includes/class-tmsm-appointment-cancelation-config.php:318
+msgid "Error Message"
+msgstr "Message d'erreur"
+
+#: includes/class-tmsm-appointment-cancelation-config.php:320
+msgid "Message displayed when cancellation fails."
+msgstr "Message à afficher en cas d'échec d'annulation."
+
+#: includes/class-tmsm-appointment-cancelation-config.php:325
+msgid "Debug Settings"
+msgstr "Paramètres debug"
+
+#: includes/class-tmsm-appointment-cancelation-config.php:328
+msgid "Enable Debug Mode"
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:330
+msgid "Enable detailed logging for debugging."
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:333
+msgid "Log Level"
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:336
+msgid "Error"
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:337
+msgid "Warning"
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:338
+msgid "Info"
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:339
+msgid "Debug"
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-config.php:341
+msgid "Minimum log level to record."
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-customer-email.php:37
+msgid "Confirmation de l'annulation de votre rendez-vous"
+msgstr ""
+
+#: includes/class-tmsm-appointment-cancelation-customer-email.php:90
 msgid "Dear customer,"
 msgstr "Chère cliente, cher client,"
 
-#: includes/class-tmsm-appointment-cancelation-customer-email.php:90
+#: includes/class-tmsm-appointment-cancelation-customer-email.php:91
 msgid ""
 "This email confirms that your appointment(s) have been successfully "
 "cancelled:"
@@ -187,99 +397,105 @@ msgstr ""
 "Cet e-mail confirme que votre (vos) rendez-vous a (ont) été annulé(s) avec "
 "succès :"
 
-#: includes/class-tmsm-appointment-cancelation-customer-email.php:100
+#: includes/class-tmsm-appointment-cancelation-customer-email.php:101
 msgid "If you have any questions, please do not hesitate to contact us."
 msgstr "Si vous avez des questions, n'hésitez pas à nous contacter."
 
-#: includes/tmsm-helpers.php:107
-msgid "janvier"
-msgstr ""
-
-#: includes/tmsm-helpers.php:108
-msgid "février"
-msgstr ""
-
-#: includes/tmsm-helpers.php:109
-msgid "mars"
-msgstr ""
-
-#: includes/tmsm-helpers.php:110
-msgid "avril"
-msgstr ""
-
-#: includes/tmsm-helpers.php:111
-msgid "mai"
+#: includes/class-tmsm-appointment-cancelation.php:141
+#: tmsm-appointment-cancelation.php:49
+#, php-format
+msgid "TMSM Appointment Cancelation plugin error: Required file %s is missing."
 msgstr ""
 
 #: includes/tmsm-helpers.php:112
-msgid "juin"
+msgid "janvier"
 msgstr ""
 
 #: includes/tmsm-helpers.php:113
-msgid "juillet"
+msgid "février"
 msgstr ""
 
 #: includes/tmsm-helpers.php:114
-msgid "août"
+msgid "mars"
 msgstr ""
 
 #: includes/tmsm-helpers.php:115
-msgid "septembre"
+msgid "avril"
 msgstr ""
 
 #: includes/tmsm-helpers.php:116
-msgid "octobre"
+msgid "mai"
 msgstr ""
 
 #: includes/tmsm-helpers.php:117
-msgid "novembre"
+msgid "juin"
 msgstr ""
 
 #: includes/tmsm-helpers.php:118
-msgid "décembre"
+msgid "juillet"
+msgstr ""
+
+#: includes/tmsm-helpers.php:119
+msgid "août"
+msgstr ""
+
+#: includes/tmsm-helpers.php:120
+msgid "septembre"
 msgstr ""
 
 #: includes/tmsm-helpers.php:121
-msgid "lundi"
+msgid "octobre"
 msgstr ""
 
 #: includes/tmsm-helpers.php:122
-msgid "mardi"
+msgid "novembre"
 msgstr ""
 
 #: includes/tmsm-helpers.php:123
-msgid "mercredi"
-msgstr ""
-
-#: includes/tmsm-helpers.php:124
-msgid "jeudi"
-msgstr ""
-
-#: includes/tmsm-helpers.php:125
-msgid "vendredi"
+msgid "décembre"
 msgstr ""
 
 #: includes/tmsm-helpers.php:126
-msgid "samedi"
+msgid "lundi"
 msgstr ""
 
 #: includes/tmsm-helpers.php:127
+msgid "mardi"
+msgstr ""
+
+#: includes/tmsm-helpers.php:128
+msgid "mercredi"
+msgstr ""
+
+#: includes/tmsm-helpers.php:129
+msgid "jeudi"
+msgstr ""
+
+#: includes/tmsm-helpers.php:130
+msgid "vendredi"
+msgstr ""
+
+#: includes/tmsm-helpers.php:131
+msgid "samedi"
+msgstr ""
+
+#: includes/tmsm-helpers.php:132
 msgid "dimanche"
 msgstr ""
 
-#: public/class-tmsm-appointment-cancelation-public.php:197
+#: public/class-tmsm-appointment-cancelation-public.php:198
 msgid "Your appointment has been successfully canceled!"
 msgstr "Votre rendez-vous est annulé!"
 
-#: public/class-tmsm-appointment-cancelation-public.php:201
+#: public/class-tmsm-appointment-cancelation-public.php:202
 msgid "An error occurred when cancelling your appointment. Please contact us."
 msgstr ""
 "Une erreur est survenue lors de l'annulation, s'il vous plaît contactez nous."
 
-#: public/class-tmsm-appointment-cancelation-public.php:237
+#: public/class-tmsm-appointment-cancelation-public.php:238
 #, php-format
-msgid "Hello %s your reservation for %s"
-msgstr "Bonjour %s votre réservation pour le %s"
+msgid "Hello %s <br/> your reservation for %s"
+msgstr "Bonjour %s <br/> votre réservation pour %s"
 
 #: public/class-tmsm-appointment-cancelation-public.php:256
 msgid "Cancellation deadline passed"
@@ -287,17 +503,17 @@ msgstr "Le délai d'annulation est dépassé"
 
 #: public/class-tmsm-appointment-cancelation-public.php:274
 msgid "Email for confirmation:"
-msgstr "Courriel de confirmation :"
+msgstr "Email de confirmation :"
 
 #: public/class-tmsm-appointment-cancelation-public.php:276
 msgid ""
 "Enter the email address where you wish to receive the cancellation "
 "confirmation."
 msgstr ""
-"Saisissez l'adresse électronique à laquelle vous souhaitez recevoir la "
-"confirmation de l'annulation."
+"Saisissez l'adresse email à laquelle vous souhaitez recevoir la confirmation "
+"de l'annulation."
 
-#: public/class-tmsm-appointment-cancelation-public.php:280
+#: public/class-tmsm-appointment-cancelation-public.php:281
 msgid ""
 "Clicking on the button below will cancel all appointments for the day. If "
 "you have any questions, please contact us"
@@ -305,7 +521,7 @@ msgstr ""
 "En cliquant sur le bouton ci-dessous, vous annulez tous les rendez-vous de "
 "la journée. Si vous avez des questions, n'hésitez pas à nous contacter"
 
-#: public/class-tmsm-appointment-cancelation-public.php:282
+#: public/class-tmsm-appointment-cancelation-public.php:283
 msgid "Cancel this appointment"
 msgstr "Annuler ce rendez-vous"
 
@@ -337,91 +553,169 @@ msgid "Your login is invalid."
 msgstr "L'utilisateur n'est pas reconnu."
 
 #: templates/email-admin-cancellation-notification.php:48
-msgid "Dear Administrator,"
-msgstr "Cher Aquatonic,"
+msgid "Cher Aquatonic,"
+msgstr ""
 
 #: templates/email-admin-cancellation-notification.php:50
-msgid "The following appointment(s) have been cancelled on your website"
-msgstr "Le(s) rendez-vous suivant(s) a/ont été annulé(s) sur votre site web"
+msgid "Les rendez-vous suivants ont été annulés sur votre site"
+msgstr ""
 
 #: templates/email-admin-cancellation-notification.php:60
-#: templates/email-cancellation-confirmation.php:44
-msgid "Date:"
+msgid "Date :"
 msgstr "Date :"
 
 #: templates/email-admin-cancellation-notification.php:62
-#: templates/email-cancellation-confirmation.php:46
-msgid "Time:"
-msgstr "Heure :"
+msgid "Heure :"
+msgstr ""
 
 #: templates/email-admin-cancellation-notification.php:64
-msgid "Appointment ID:"
-msgstr "ID du rendez-vous :"
+msgid "ID de rendez-vous :"
+msgstr ""
 
 #: templates/email-admin-cancellation-notification.php:66
-msgid "Location:"
-msgstr "Localisation :"
+msgid "Emplacement :"
+msgstr ""
+
+#: templates/email-admin-cancellation-notification.php:73
+msgid "Email du client :"
+msgstr ""
 
 #: templates/email-admin-cancellation-notification.php:76
 msgid ""
-"Please check your appointment system for more details regarding this "
-"cancellation."
-msgstr ""
-"Veuillez consulter votre système de rendez-vous (Aquos) pour plus de détails "
+"Veuillez vérifier votre système de rendez-vous pour plus de détails "
 "concernant cette annulation."
+msgstr ""
 
 #: templates/email-admin-cancellation-notification.php:79
-#: templates/email-cancellation-confirmation.php:79
-msgid "Sincerely,"
-msgstr "A très bientôt,"
+msgid "Cordialement,"
+msgstr ""
 
 #: templates/email-admin-cancellation-notification.php:85
-msgid "This is an automated notification from your WordPress website."
-msgstr "Il s'agit d'une notification automatisée."
+msgid "Ceci est une notification automatique de votre site WordPress."
+msgstr ""
 
 #: templates/email-cancellation-confirmation.php:26
-msgid "Appointment Cancellation Confirmation"
-msgstr "Confirmation d'annulation de rendez-vous"
-
-#: templates/email-cancellation-confirmation.php:31
-msgid "Your Appointment Cancellation Has Been Confirmed"
-msgstr "L'annulation de votre rendez-vous a été confirmée"
-
-#: templates/email-cancellation-confirmation.php:32
-msgid "Hello "
-msgstr "Bonjour "
-
-#: templates/email-cancellation-confirmation.php:34
-msgid ""
-"This email confirms that your appointment(s) have been successfully "
-"cancelled with"
+msgid "Confirmation d'annulation de Rendez-vous"
 msgstr ""
-"Cet e-mail confirme que votre (vos) rendez-vous a (ont) été annulé(s) avec "
-"succès auprès de"
 
-#: templates/email-cancellation-confirmation.php:53
-msgid "our booking page"
-msgstr "notre page de réservation"
+#: templates/email-cancellation-confirmation.php:35
+msgid "Annulation de votre rendez-vous."
+msgstr ""
+
+#: templates/email-cancellation-confirmation.php:36
+msgid "Bonjour "
+msgstr ""
+
+#: templates/email-cancellation-confirmation.php:42
+msgid "Suite à votre demande, nous vous confirmons que votre rendez-vous à l'"
+msgstr ""
+
+#: templates/email-cancellation-confirmation.php:42
+msgid " est annulé."
+msgstr ""
+
+#: templates/email-cancellation-confirmation.php:52
+msgid "Date:"
+msgstr "Date :"
+
+#: templates/email-cancellation-confirmation.php:54
+msgid "Heure:"
+msgstr ""
 
 #: templates/email-cancellation-confirmation.php:61
-#, php-format
-msgid "If you want to reschedule your appointment, please visit %s."
+msgid "suivez-ce lien"
 msgstr ""
-"Si vous souhaitez reporter votre rendez-vous, veuillez vous rendre sur le "
-"site %s."
 
-#: templates/email-cancellation-confirmation.php:67
-msgid "contact us"
-msgstr "nous contacter"
-
-#: templates/email-cancellation-confirmation.php:70
+#: templates/email-cancellation-confirmation.php:69
 #, php-format
-msgid "If you have any questions, please do not hesitate to %s."
-msgstr "Si vous avez des questions, n'hésitez pas à contacter %s."
-
-#: templates/email-cancellation-confirmation.php:85
-msgid ""
-"This is an automated email, please do not reply directly to this message."
+msgid "Pour programmer un nouveau soin, %s."
 msgstr ""
-"Il s'agit d'un courriel automatisé, veuillez ne pas répondre directement à "
-"ce message."
+
+#: templates/email-cancellation-confirmation.php:75
+msgid "Contactez-nous"
+msgstr "Contactez-nous"
+
+#: templates/email-cancellation-confirmation.php:78
+#, php-format
+msgid "Une question ? %s."
+msgstr ""
+
+#: templates/email-cancellation-confirmation.php:87
+msgid "A très bientôt"
+msgstr ""
+
+#: templates/email-cancellation-confirmation.php:88
+msgid "L'équipe du spa"
+msgstr ""
+
+#: templates/email-cancellation-confirmation.php:94
+msgid "Ceci est un email automatique merci de ne pas y répondre directement"
+msgstr ""
+
+#: tmsm-appointment-cancelation.php:78
+#, php-format
+msgid "TMSM Appointment Cancelation plugin error: %s"
+msgstr "Paramètres d'annulation de rendez-vous : %s"
+
+#~ msgid "Dear Administrator,"
+#~ msgstr "Cher Aquatonic,"
+
+#~ msgid "The following appointment(s) have been cancelled on your website"
+#~ msgstr "Le(s) rendez-vous suivant(s) a/ont été annulé(s) sur votre site web"
+
+#~ msgid "Time:"
+#~ msgstr "Heure :"
+
+#~ msgid "Appointment ID:"
+#~ msgstr "ID du rendez-vous :"
+
+#~ msgid "Location:"
+#~ msgstr "Localisation :"
+
+#~ msgid ""
+#~ "Please check your appointment system for more details regarding this "
+#~ "cancellation."
+#~ msgstr ""
+#~ "Veuillez consulter votre système de rendez-vous (Aquos) pour plus de "
+#~ "détails concernant cette annulation."
+
+#~ msgid "Sincerely,"
+#~ msgstr "A très bientôt,"
+
+#~ msgid "This is an automated notification from your WordPress website."
+#~ msgstr "Il s'agit d'une notification automatisée."
+
+#~ msgid "Appointment Cancellation Confirmation"
+#~ msgstr "Confirmation d'annulation de rendez-vous"
+
+#~ msgid "Your Appointment Cancellation Has Been Confirmed"
+#~ msgstr "L'annulation de votre rendez-vous a été confirmée"
+
+#~ msgid "Hello "
+#~ msgstr "Bonjour "
+
+#~ msgid ""
+#~ "This email confirms that your appointment(s) have been successfully "
+#~ "cancelled with"
+#~ msgstr ""
+#~ "Cet e-mail confirme que votre (vos) rendez-vous a (ont) été annulé(s) "
+#~ "avec succès auprès de"
+
+#~ msgid "our booking page"
+#~ msgstr "notre page de réservation"
+
+#, php-format
+#~ msgid "If you want to reschedule your appointment, please visit %s."
+#~ msgstr ""
+#~ "Si vous souhaitez reporter votre rendez-vous, veuillez vous rendre sur le "
+#~ "site %s."
+
+#, php-format
+#~ msgid "If you have any questions, please do not hesitate to %s."
+#~ msgstr "Si vous avez des questions, n'hésitez pas à contacter %s."
+
+#~ msgid ""
+#~ "This is an automated email, please do not reply directly to this message."
+#~ msgstr ""
+#~ "Il s'agit d'un courriel automatisé, veuillez ne pas répondre directement "
+#~ "à ce message."
