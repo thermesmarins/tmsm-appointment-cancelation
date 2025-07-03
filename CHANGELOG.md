@@ -1,3 +1,6 @@
+### 1.0.2 July 3rd, 2025
+* add github uri
+
 ### 1.0.1 July 3rd, 2025
 * Remove timezone setting and debug logs
 
