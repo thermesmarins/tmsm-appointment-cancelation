@@ -1,3 +1,6 @@
+### 1.0.5 July 7th, 2025
+* End of test mode, production ready.
+
 ### 1.0.4 July 7th, 2025
 * Update french traduction.
 

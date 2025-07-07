@@ -14,7 +14,7 @@ class Tmsm_Appointment_Cancelation_Aquos
     const SITE_ID_TEST = 10;
 
     // Set to true for test mode, false for production
-    const TEST_MODE = true; // Change to true for test environment
+    const TEST_MODE = false; // Change to true for test environment
 
     private $aquos_cancelation_url;
     private $aquos_appointment_delay;
