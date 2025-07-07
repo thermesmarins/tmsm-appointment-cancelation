@@ -1,3 +1,8 @@
+### 1.0.3 July 7th, 2025
+* Update Aquos appointment request without date 
+* Add null checks for error handeling
+* Add translations
+
 ### 1.0.2 July 3rd, 2025
 * add github uri
 
