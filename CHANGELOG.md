@@ -1,3 +1,6 @@
+### 1.0.4 July 7th, 2025
+* Update french traduction.
+
 ### 1.0.3 July 7th, 2025
 * Update Aquos appointment request without date 
 * Add null checks for error handeling
