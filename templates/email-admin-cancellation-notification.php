@@ -71,10 +71,7 @@ if (! defined('ABSPATH')) {
 
         <?php if (!empty($client_email)) : ?>
             <p><?php echo esc_html__('Email du client :', 'tmsm-appointment-cancelation'); ?> <a href="mailto:<?php echo esc_attr($client_email); ?>" style="color:rgb(0, 115, 170); text-decoration: none;"><?php echo esc_html($client_email); ?></a></p>
-        <?php endif; ?>
-
-        <p><?php echo esc_html__('Veuillez vérifier votre système de rendez-vous pour plus de détails concernant cette annulation.', 'tmsm-appointment-cancelation'); ?></p>
-
+        <?php endif; ?>        
         <p style="text-align: center; margin-top: 30px;">
             <?php echo esc_html__('Cordialement,', 'tmsm-appointment-cancelation'); ?><br>
             <strong><?php echo esc_html($site_name); ?></strong><br>

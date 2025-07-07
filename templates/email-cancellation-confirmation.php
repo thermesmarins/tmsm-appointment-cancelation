@@ -84,7 +84,7 @@ if (! defined('ABSPATH')) {
             ?></p>
 
         <p style="text-align: center; margin-top: 30px;">
-            <?php echo esc_html__('A très bientôt', 'tmsm-appointment-cancelation'); ?><br>
+            <?php echo esc_html__('À très bientôt', 'tmsm-appointment-cancelation'); ?><br>
             <?php echo esc_html__('L\'équipe du spa', 'tmsm-appointment-cancelation'); ?>
             <strong><?php echo esc_html($site_name); ?></strong><br>
             <a href="<?php echo esc_url($site_url); ?>" style="color: #0073aa; text-decoration: none;"><?php echo esc_url($site_url); ?></a>

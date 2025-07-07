@@ -290,7 +290,7 @@ msgstr "Activer l'e-mail de l'administrateur"
 
 #: includes/class-tmsm-appointment-cancelation-config.php:285
 msgid "Email address for admin notifications."
-msgstr "Adresse email pour la notification admin"
+msgstr "Adresse email pour la notification admin."
 
 #: includes/class-tmsm-appointment-cancelation-config.php:288
 msgid "Enable Email Notifications"
@@ -485,7 +485,7 @@ msgstr ""
 
 #: public/class-tmsm-appointment-cancelation-public.php:198
 msgid "Your appointment has been successfully canceled!"
-msgstr "Votre rendez-vous est annulé!"
+msgstr "Votre rendez-vous est annulé !"
 
 #: public/class-tmsm-appointment-cancelation-public.php:202
 msgid "An error occurred when cancelling your appointment. Please contact us."
@@ -495,7 +495,7 @@ msgstr ""
 #: public/class-tmsm-appointment-cancelation-public.php:238
 #, php-format
 msgid "Hello %s <br/> your reservation for %s"
-msgstr "Bonjour %s <br/> votre réservation pour %s"
+msgstr "Bonjour %s <br/> Votre réservation du %s :"
 
 #: public/class-tmsm-appointment-cancelation-public.php:256
 msgid "Cancellation deadline passed"
