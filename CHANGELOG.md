@@ -1,3 +1,6 @@
+### 1.0.8 July 22th, 2025
+* Fix site url for spam reception
+
 ### 1.0.7 July 22th, 2025
 * Fix resaspa url with www was missing
 

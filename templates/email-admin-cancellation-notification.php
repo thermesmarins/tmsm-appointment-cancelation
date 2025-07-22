@@ -75,7 +75,7 @@ if (! defined('ABSPATH')) {
         <p style="text-align: center; margin-top: 30px;">
             <?php echo esc_html__('Cordialement,', 'tmsm-appointment-cancelation'); ?><br>
             <strong><?php echo esc_html($site_name); ?></strong><br>
-            <a href="<?php echo esc_url($site_url); ?>" style="color: #0073aa; text-decoration: none;"><?php echo esc_url($site_url); ?></a>
+            <p><?php echo $site_url; ?></p>
         </p>
         
         <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #888;">
