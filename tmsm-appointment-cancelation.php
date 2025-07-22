@@ -3,7 +3,7 @@
  * Plugin Name: TMSM Appointment Cancelation
  * Plugin URI: https://github.com/thermesmarins/tmsm-appointment-cancelation
  * Description: Allows users to cancel appointments made by phone through the Aquos API integration.
- * Version: 1.0.5
+ * Version: 1.0.6
  * Author: Arnaud Flament
  * Author URI: https://github.com/ArnaudFlament35
  * License: GPL v2 or later
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'TMSM_APPOINTMENT_CANCELATION_VERSION', '1.0.5' );
+define( 'TMSM_APPOINTMENT_CANCELATION_VERSION', '1.0.6' );
 define( 'TMSM_APPOINTMENT_CANCELATION_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'TMSM_APPOINTMENT_CANCELATION_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'TMSM_APPOINTMENT_CANCELATION_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );

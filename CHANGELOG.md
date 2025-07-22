@@ -1,3 +1,6 @@
+### 1.0.6 July 7th, 2025
+* Fix disable test mode
+
 ### 1.0.5 July 7th, 2025
 * End of test mode, production ready.
 

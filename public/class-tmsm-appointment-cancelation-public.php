@@ -150,12 +150,13 @@ class Tmsm_Appointment_Cancelation_Public
             $aquos_cancel_appointments = new Tmsm_Appointment_Cancelation_Aquos($fonctionnal_id);
             $site_id = isset($_POST['site_id']) ? sanitize_text_field($_POST['site_id']) : '';
             $cancel_status = false;
-            if ($site_id == Tmsm_Appointment_Cancelation_Aquos::SITE_ID_TEST) {
+            // if ($site_id == Tmsm_Appointment_Cancelation_Aquos::SITE_ID_TEST) {
                 error_log('Annulation des rendez-vous en mode test');
                 $cancel_status = $aquos_cancel_appointments->cancel_appointment($appointment_ids);
-            } else {
-                $cancel_status = false;
-            }
+            // } else {
+            //     error_log('Annulation des rendez-vous en mode production');
+            //     $cancel_status = false;
+            // }
             $user_email = isset($_POST['email_confirm']) ? sanitize_email($_POST['email_confirm']) : '';
             $customer_name = isset($_POST['customer_name']) ? sanitize_text_field($_POST['customer_name']) : '';
             $redirect_url_base = home_url('/rdv/');
