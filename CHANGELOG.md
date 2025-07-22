@@ -1,4 +1,7 @@
-### 1.0.6 July 7th, 2025
+### 1.0.7 July 22th, 2025
+* Fix resaspa url with www was missing
+
+### 1.0.6 July 22th, 2025
 * Fix disable test mode
 
 ### 1.0.5 July 7th, 2025
